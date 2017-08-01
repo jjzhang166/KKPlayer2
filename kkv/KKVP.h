@@ -12,5 +12,6 @@ enum IPCMSG{
 	IPCDownPause=10,
 	IPCDownResume=11,
 	IPCALLSpeed=15,
+	IPCDELFILE=16,
 };
 #endif

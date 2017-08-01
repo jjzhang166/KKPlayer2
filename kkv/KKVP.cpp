@@ -629,6 +629,30 @@ bool __declspec(dllexport) KKAllAVFilesSpeedInfo(char **OutJsonBuf)
 	 G_KKMapLock.Unlock();
 	return 1;
 }
+bool __declspec(dllexport) KKDelDownAVFile(char *strUrl,int state)
+{
+    if(G_IPC_Read_Write!=1)
+		return 0;
+	Json::Value jsonValue;
+	
+	jsonValue["IPCMSG"]=IPCDELFILE;
+	jsonValue["Guid"]="";
+	jsonValue["Url"]=strUrl;
+    jsonValue["HRW"]=0;
+	jsonValue["FirstRead"]=0;
+	std::string strGuid=jsonValue.toStyledString();
+    int buflen=strGuid.length()+1024;
+	
+	unsigned char *IPCbuf=(unsigned char*)::malloc(buflen);
+	memset(IPCbuf,0,buflen);
+	
+	
+	memcpy(IPCbuf,strGuid.c_str(),strGuid.length());
+	KKVWritePipe(IPCbuf,buflen,0);
+	::free(IPCbuf);
+
+	return 1;
+}
 char * c_left(char *dst,char *src, int n)
 {
 	char *p = src;

@@ -19,10 +19,11 @@ extern "C"
     typedef char (*fKKDownAVFile)(char *strUrl);
 	/********暂停下载或者重新下载下载函数**********/
 	typedef void (*fKKPauseDownAVFile)(char *strUrl,bool Pause);
-	
-	
-	/************得到下载速度信息*********/
+	//删除一个文件
+	typedef void (*fKKDelDownAVFile)(char *strUrl,int state);
+	/************得到一个文件的下载速度信息*********/
     typedef bool (*fKKDownAVFileSpeedInfo)(const char *strurl,char *jsonBuf,int len);
+	//得到全部的下载信息
 	typedef bool (*fKKAllAVFilesSpeedInfo)(char **OutJsonBuf);
     //刷新队列
 	typedef void (*fFlushPlayerQue)(void *opaque);
@@ -77,6 +78,7 @@ extern "C"
 		/*************得到下载速度信息************/
 		fKKDownAVFileSpeedInfo KKDownAVFileSpeedInfo;
 		fKKAllAVFilesSpeedInfo KKAllAVFilesSpeedInfo;
+		fKKDelDownAVFile       KKDelDownAVFile;
 		/*****************释放内存*************/
 		fFree KKFree;
 		/***********分析url***************/

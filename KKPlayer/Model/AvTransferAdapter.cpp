@@ -16,19 +16,21 @@ namespace SOUI
 	char strabce[64]="";
 	class DataItem
 	{
-	public:
-		DataItem()
-		{
-		     speed=0;
-	         progress=0;
-             filesize=0;
-	          Url=L"";
-		}
-		~DataItem(){}
-	   int  speed;
-	   long long  progress;
-	   long long  filesize;
-	   std::wstring  Url;
+		public:
+			DataItem()
+			{
+				 speed=0;
+				 progress=0;
+				 filesize=0;
+				  Url=L"";
+			}
+			~DataItem(){}
+		   int  speed;
+		   long long  progress;
+		   long long  filesize;
+		   std::wstring  Url;
+		   std::string   srcUrl;
+		   char ptl[32];
 	};
 	static std::vector<DataItem> DataItemVector;
 
@@ -119,6 +121,8 @@ namespace SOUI
 
 							 DataItem Item;
 							 Item.Url=temp;
+							 Item.srcUrl=url;
+							 strcpy(Item.ptl,It->ptl);
 							 Item.filesize=speedinfo["filesize"].asInt64();
 							 Item.speed=speedinfo["speed"].asInt();
 							 Item.progress=speedinfo["progress"].asInt64();/* */
@@ -152,6 +156,24 @@ namespace SOUI
 	}
 	bool CDownAVListMcAdapterFix::OnItemDelete(EventArgs *pEvt)
 	{
+		SWindow *pBtn=(SWindow *)pEvt->sender;
+		int Id=pBtn->GetUserData();
+		if(Id<DataItemVector.size()){
+			DataItem &Item=DataItemVector.at(Id);
+
+			   std::list<KKPluginInfo>  &PlList=KKPlayer::GetKKPluginInfoList();
+		       std::list<KKPluginInfo>::iterator It=PlList.begin();
+		       for(;It!=PlList.end();++It){
+				   
+                  if( !strncmp(Item.ptl,It->ptl,strlen(Item.ptl)))
+				  {
+					  if(It->KKDelDownAVFile)
+					  {
+					      It->KKDelDownAVFile(Item.srcUrl,0);
+					  }
+					  return true;
+				  }
+		       }
 	  return true;
 	}
     bool  CDownAVListMcAdapterFix::OnItemPause(EventArgs *pEvt)
@@ -219,6 +241,7 @@ namespace SOUI
 			 }
              pWin= pItem->FindChildByName(L"btn_delete");
 			 if(pWin){
+				     pWin->SetUserData(position);
 					 pWin->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CDownAVListMcAdapterFix::OnItemDelete, this));
 			 }
 	   }
