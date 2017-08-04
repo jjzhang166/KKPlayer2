@@ -1945,7 +1945,8 @@ void KKPlayer::ReadAV()
 		av_dict_set(&format_opts, "fflags", "-nobuffer ", 0);
 	}else if(!strncmp(pVideoInfo->filename, "rtsp:",5)){
 		av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
-        av_dict_set(&format_opts, "stimeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
+       // av_dict_set(&format_opts, "stimeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
+		 av_dict_set(&format_opts, "-fflags","nobuffer", 0);
 	}
 	///ÃüÁîÐÐÑ¡Ïî
 	if(m_strcmd.length()>1)

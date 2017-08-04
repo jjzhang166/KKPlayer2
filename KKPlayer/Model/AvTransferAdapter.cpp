@@ -169,16 +169,17 @@ namespace SOUI
 				  {
 					  if(It->KKDelDownAVFile)
 					  {
-					      It->KKDelDownAVFile(Item.srcUrl,0);
+					      //It->KKDelDownAVFile(Item.srcUrl,0);
 					  }
 					  return true;
 				  }
 		       }
+		}
 	  return true;
 	}
     bool  CDownAVListMcAdapterFix::OnItemPause(EventArgs *pEvt)
 	{
-	return true;
+	    return true;
 	}
 	bool  CDownAVListMcAdapterFix::OnItemOpenLocal(EventArgs *pEvt)
     {
