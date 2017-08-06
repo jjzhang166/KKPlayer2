@@ -527,14 +527,14 @@ void __declspec(dllexport) DeleteKKPlugin(KKPlugin* p)
 }
 
 //下载文件件
-char __declspec(dllexport)KKDownAVFile(char *strUrl)
+char __declspec(dllexport)KKDownAVFile(const char *strUrl)
 {
 	  
 	  return 0;
 }
 
 //暂停下载文件
-void __declspec(dllexport)KKPauseDownAVFile(char *strUrl,bool Pause)
+void __declspec(dllexport)KKPauseDownAVFile(const char *strUrl,bool Pause)
 {
 	if(G_IPC_Read_Write!=1)
 		return ;
@@ -629,7 +629,7 @@ bool __declspec(dllexport) KKAllAVFilesSpeedInfo(char **OutJsonBuf)
 	 G_KKMapLock.Unlock();
 	return 1;
 }
-bool __declspec(dllexport) KKDelDownAVFile(char *strUrl,int state)
+bool __declspec(dllexport) KKDelDownAVFile(const char *strUrl,int state)
 {
     if(G_IPC_Read_Write!=1)
 		return 0;

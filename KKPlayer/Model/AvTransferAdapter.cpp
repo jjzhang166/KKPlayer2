@@ -169,7 +169,7 @@ namespace SOUI
 				  {
 					  if(It->KKDelDownAVFile)
 					  {
-					      //It->KKDelDownAVFile(Item.srcUrl,0);
+					      It->KKDelDownAVFile(Item.srcUrl.c_str(),0);
 					  }
 					  return true;
 				  }

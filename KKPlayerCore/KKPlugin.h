@@ -16,11 +16,11 @@ extern "C"
 	/***********用于释放内存**************/
 	typedef void (*fFree)(void*);
     /****下载函数****/
-    typedef char (*fKKDownAVFile)(char *strUrl);
+    typedef char (*fKKDownAVFile)(const char *strUrl);
 	/********暂停下载或者重新下载下载函数**********/
-	typedef void (*fKKPauseDownAVFile)(char *strUrl,bool Pause);
+	typedef void (*fKKPauseDownAVFile)(const char *strUrl,bool Pause);
 	//删除一个文件
-	typedef void (*fKKDelDownAVFile)(char *strUrl,int state);
+	typedef void (*fKKDelDownAVFile)(const char *strUrl,int state);
 	/************得到一个文件的下载速度信息*********/
     typedef bool (*fKKDownAVFileSpeedInfo)(const char *strurl,char *jsonBuf,int len);
 	//得到全部的下载信息
