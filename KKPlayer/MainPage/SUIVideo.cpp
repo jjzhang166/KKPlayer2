@@ -23,7 +23,7 @@ namespace SOUI
 	{
 		if(m_pIKKplayer!=0)
 		{
-			if(bVisible==TRUE&&m_nPlayerState>=0)
+			if(bVisible==TRUE)
 			{
 				if(!::IsWindowVisible(m_pIKKplayer->GetPlayerWnd()))
 				   ::ShowWindow(m_pIKKplayer->GetPlayerWnd(),SW_SHOW);

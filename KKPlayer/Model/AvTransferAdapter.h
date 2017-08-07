@@ -7,7 +7,8 @@
 #include <map>
 #include <helper/SAdapterBase.h>
 #include <control/SMCListView.h>
-
+#include <string>
+#include "../MainPage/IMainUI.h"
 namespace SOUI
 {
 	class CKKmclv;
@@ -19,25 +20,27 @@ namespace SOUI
 	class CDownAVListMcAdapterFix : public SMcAdapterBase
 	{
 		public:
-			CDownAVListMcAdapterFix(SMCListView *pSMCListView);
-			~CDownAVListMcAdapterFix();
-			void Refresh();
-			int getCount();
+			CDownAVListMcAdapterFix(IMainUI* pIMainUI,SMCListView *pSMCListView,std::string url);
+				~CDownAVListMcAdapterFix();
+				void Refresh();
+				int getCount();
 
-			SStringT getSizeText(DWORD dwSize);
-			bool OnItemClick(EventArgs *pEvt);
-			virtual void getView(int position, SWindow * pItem,pugi::xml_node xmlTemplate);
+				SStringT getSizeText(DWORD dwSize);
+				bool OnItemClick(EventArgs *pEvt);
+				virtual void getView(int position, SWindow * pItem,pugi::xml_node xmlTemplate);
 
-			bool OnButtonClick(EventArgs *pEvt);
-			SStringW GetColumnName(int iCol) const;
-			
-			bool OnSort(int iCol,SHDSORTFLAG * stFlags,int nCols);
+				bool OnButtonClick(EventArgs *pEvt);
+				SStringW GetColumnName(int iCol) const;
+				
+				bool OnSort(int iCol,SHDSORTFLAG * stFlags,int nCols);
 
-			bool OnItemDelete(EventArgs *pEvt);
-			 bool OnItemPause(EventArgs *pEvt);
-			 bool OnItemOpenLocal(EventArgs *pEvt);
+				bool OnItemDelete(EventArgs *pEvt);
+				bool OnItemPause(EventArgs *pEvt);
+				bool OnItemOpenLocal(EventArgs *pEvt);
 		private:
 			SMCListView *m_pSMCListView;
+			std::string m_strurl;
+			IMainUI*    m_pIMainUI;
 	};
 }
 #endif

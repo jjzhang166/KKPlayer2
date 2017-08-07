@@ -376,6 +376,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MainPage\IMainUI.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MainPage\KKWkeWebkit.cpp"
 				>
 			</File>

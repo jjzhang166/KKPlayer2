@@ -1480,14 +1480,14 @@ int queue_picture(SKK_VideoState *is, AVFrame *pFrame, double pts,double duratio
 			 //如果是硬件加速，转化就慢了。
 		     sws_scale(is->img_convert_ctx, pOutAV->data, pOutAV->linesize,0,pOutAV->height,vp->Bmp.data, vp->Bmp.linesize);
 			 vp->picformat= is->DstAVff;
-             LOGE_KK("dex sws_scale\n");
+            // LOGE_KK("dex sws_scale\n");
 		}else{
 		      av_frame_move_ref(vp->frame,pOutAV);
 			  memcpy(vp->Bmp.data,vp->frame->data,sizeof(vp->Bmp.data));
 			  memcpy(vp->Bmp.linesize,vp->frame->linesize,sizeof(vp->Bmp.linesize));
 			  vp->picformat=(int)format;
 			  
-			  LOGE_KK("dex no copy\n");
+			//  LOGE_KK("dex no copy\n");
 		}
 		pPictq->mutex->Lock();
 		vp->uploaded=0;

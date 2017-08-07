@@ -679,7 +679,7 @@ retry:
 #ifdef WIN32
 				char abcdx[102]="";
 				sprintf_s(abcdx,102,"is->delay:%f \n",is->delay);
-				//OutputDebugStringA(abcdx);
+				OutputDebugStringA(abcdx);
 
 #endif
 				time= av_gettime_relative()/1000000.0;
@@ -1946,7 +1946,8 @@ void KKPlayer::ReadAV()
 	}else if(!strncmp(pVideoInfo->filename, "rtsp:",5)){
 		av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
        // av_dict_set(&format_opts, "stimeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
-		 av_dict_set(&format_opts, "-fflags","nobuffer", 0);
+		 av_dict_set(&format_opts, "fflags","nobuffer", 0);
+		  av_dict_set(&format_opts, "max_delay","500",0);
 	}
 	///ÃüÁîÐÐÑ¡Ïî
 	if(m_strcmd.length()>1)

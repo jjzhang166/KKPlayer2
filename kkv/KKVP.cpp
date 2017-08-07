@@ -640,6 +640,7 @@ bool __declspec(dllexport) KKDelDownAVFile(const char *strUrl,int state)
 	jsonValue["Url"]=strUrl;
     jsonValue["HRW"]=0;
 	jsonValue["FirstRead"]=0;
+	jsonValue["CmdState"]=state;
 	std::string strGuid=jsonValue.toStyledString();
     int buflen=strGuid.length()+1024;
 	

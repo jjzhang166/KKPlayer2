@@ -86,7 +86,8 @@ namespace SOUI
 		}
 		return strabce;
 	}
-	CDownAVListMcAdapterFix::CDownAVListMcAdapterFix(SMCListView *pSMCListView)
+	CDownAVListMcAdapterFix::CDownAVListMcAdapterFix(IMainUI* pIMainUI,SMCListView *pSMCListView,std::string url):
+	m_strurl(url),m_pIMainUI(pIMainUI)
 	{
 	    m_pSMCListView=pSMCListView;
 	}
@@ -167,6 +168,11 @@ namespace SOUI
 				   
                   if( !strncmp(Item.ptl,It->ptl,strlen(Item.ptl)))
 				  {
+
+					  if(!strncmp(Item.srcUrl.c_str(),m_strurl.c_str(),strlen(m_strurl.c_str())))
+					  {
+					     m_pIMainUI-> CloseMedia();
+					  }
 					  if(It->KKDelDownAVFile)
 					  {
 					      It->KKDelDownAVFile(Item.srcUrl.c_str(),0);

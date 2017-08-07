@@ -20,8 +20,10 @@ namespace SOUI
 	    SMCListView *KKmclv=(SMCListView*)FindChildByName(L"mclv_AVDownList");
 		if(KKmclv!=NULL)
 		{
-			CDownAVListMcAdapterFix *Fix = new CDownAVListMcAdapterFix(KKmclv);
+			std::string url=m_pDlgMain->GetOpeningUrl();
+			CDownAVListMcAdapterFix *Fix = new CDownAVListMcAdapterFix(m_pDlgMain,KKmclv,url);
 		    KKmclv->SetAdapter(Fix);
+			Fix->Refresh(); 
 		    Fix->Release();
 		}
 		this->SetTimer(1,1000);
