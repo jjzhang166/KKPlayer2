@@ -1943,11 +1943,12 @@ void KKPlayer::ReadAV()
         //rtmp 不支持 timeout
 		av_dict_set(&format_opts, "rw_timeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
 		av_dict_set(&format_opts, "fflags", "-nobuffer ", 0);
+		av_dict_set(&format_opts, "max_delay","500",0);
 	}else if(!strncmp(pVideoInfo->filename, "rtsp:",5)){
 		av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
        // av_dict_set(&format_opts, "stimeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
 		 av_dict_set(&format_opts, "fflags","nobuffer", 0);
-		  av_dict_set(&format_opts, "max_delay","500",0);
+		 av_dict_set(&format_opts, "max_delay","500",0);
 	}
 	///命令行选项
 	if(m_strcmd.length()>1)
