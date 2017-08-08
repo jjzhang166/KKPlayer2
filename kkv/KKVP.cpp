@@ -511,6 +511,7 @@ unsigned int  Kkv_GetCacheTime(void *opaque)//guidlen+guid+msgId+h+FileURL+FileU
 KKPlugin __declspec(dllexport) *CreateKKPlugin()
 {
 	KKPlugin* p= (KKPlugin*)::malloc(sizeof(KKPlugin));
+	memset(p,0,sizeof(KKPlugin));
 	p->GetCacheTime=Kkv_GetCacheTime;
 	p->kkread=Kkv_read_packet;
 	p->kkseek=Kkv_seek;
@@ -616,6 +617,9 @@ bool __declspec(dllexport) KKAllAVFilesSpeedInfo(char **OutJsonBuf)
 	 G_KKMapLock.Lock();
 	 int len=G_StrAllSpeedInfoJson.length();
 	 if(len>10){
+
+		
+
 	     len+=1024;
 	     char * Temp=(char *)::malloc(len);
 	     assert(Temp);
@@ -652,6 +656,25 @@ bool __declspec(dllexport) KKDelDownAVFile(const char *strUrl,int state)
 	KKVWritePipe(IPCbuf,buflen,0);
 	::free(IPCbuf);
 
+     G_KKMapLock.Lock();
+	     Json::Reader JsReader;
+		 Json::Value JsValue;
+		 if(JsReader.parse(G_StrAllSpeedInfoJson.c_str(),JsValue))
+		 {
+			 std::string url="kkv:";
+			 url=strUrl;
+			 int count= JsValue.size();
+			 for(int i=0;i<count;i++){
+			      Json::Value Itme=JsValue[i];
+				  std::string temp= Itme["url"].asString();
+				  if(temp==url){
+					  JsValue.removeIndex(i,&Itme);
+					  G_StrAllSpeedInfoJson=JsValue.toStyledString();
+					  break;
+				  }
+			 }
+		 }
+    G_KKMapLock.Unlock();
 	return 1;
 }
 char * c_left(char *dst,char *src, int n)

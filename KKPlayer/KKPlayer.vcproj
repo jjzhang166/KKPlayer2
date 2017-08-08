@@ -440,6 +440,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Tool\curlcode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tool\curlcode.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Tool\FileRelation.cpp"
 				>
 			</File>

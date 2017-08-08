@@ -32,10 +32,10 @@ translucent="0">
                                                 <text name="txt_speed" align="center" pos="0,0,-0,-0" align="center" valign="middle"  ></text>
                                       </window>
 									  <window name="col4">
-									           <window  pos="|-30,|-8,@60,-0">
+									           <window  pos="|-30,|-8,-0,-0">
 									           <imgbtn skin="_skin.1PAUSE" name="btn_pause" pos="0,0,@18,@16" tip="暂停下载" animate="0"/> 
 											   <imgbtn skin="_skin.DeleteBtn" name="btn_delete" pos="[10,0,@16,@16" tip="删除" animate="0"/> 
-                                               <imgbtn skin="_skin.OpenFolderBtn"  pos="[10,0,@16,@16" tip="打开文件夹" animate="0"/>
+                                               <imgbtn skin="_skin.OpenFolderBtn" name="btn_openlocate"  pos="[10,0,@16,@16" tip="打开文件夹" animate="0"/>
                                                </window>											   
                                       </window>
 							 </template>

@@ -4,6 +4,7 @@
 #include "../MainPage/AVTransferDlg.h"
 #include "json/json.h"
 #include "../Tool/cchinesecode.h"
+#include "../Tool/curlcode.h"
 #include <vector>
 #include <sstream>
 #include <iomanip>
@@ -11,6 +12,7 @@
 #include <algorithm>
 #include <math.h>
 #include <iosfwd>
+#include <shellapi.h>
 namespace SOUI
 {
 	char strabce[64]="";
@@ -30,6 +32,8 @@ namespace SOUI
 		   long long  filesize;
 		   std::wstring  Url;
 		   std::string   srcUrl;
+		   ///如果支持文件存储路径
+		   std::wstring   savefilepath;
 		   char ptl[32];
 	};
 	static std::vector<DataItem> DataItemVector;
@@ -127,6 +131,12 @@ namespace SOUI
 							 Item.filesize=speedinfo["filesize"].asInt64();
 							 Item.speed=speedinfo["speed"].asInt();
 							 Item.progress=speedinfo["progress"].asInt64();/* */
+
+							 url=speedinfo["filepath"].asString();
+							 url=CURLCode::UrlDecode(url);
+							 memset(temp,0,2048);
+							 CChineseCode::charTowchar(url.c_str(),temp, 2048) ; /**/
+							 Item.savefilepath=temp;
 							 DataItemVector.push_back(Item);
 						}
 					 }
@@ -169,7 +179,10 @@ namespace SOUI
                   if( !strncmp(Item.ptl,It->ptl,strlen(Item.ptl)))
 				  {
 
-					  if(!strncmp(Item.srcUrl.c_str(),m_strurl.c_str(),strlen(m_strurl.c_str())))
+					  std::string temp=Item.ptl;
+					  temp+=":";
+					  temp+=Item.srcUrl;
+					  if(!strncmp(temp.c_str(),m_strurl.c_str(),strlen(m_strurl.c_str())))
 					  {
 					     m_pIMainUI-> CloseMedia();
 					  }
@@ -185,11 +198,26 @@ namespace SOUI
 	}
     bool  CDownAVListMcAdapterFix::OnItemPause(EventArgs *pEvt)
 	{
+		SWindow *pBtn=(SWindow *)pEvt->sender;
+        int Id=pBtn->GetUserData();
+		if(Id<DataItemVector.size()){
+			DataItem &Item=DataItemVector.at(Id);
+
+		}
 	    return true;
 	}
 	bool  CDownAVListMcAdapterFix::OnItemOpenLocal(EventArgs *pEvt)
     {
-	return true;
+        SWindow *pBtn=(SWindow *)pEvt->sender;
+        int Id=pBtn->GetUserData();
+		if(Id<DataItemVector.size()){
+			DataItem &Item=DataItemVector.at(Id);
+
+			std::wstring temp=L"/select, ";
+			temp+=Item.savefilepath;
+			ShellExecute(NULL,NULL,_T("explorer"),temp.c_str(),NULL,SW_SHOW); 
+		}
+	   return true;
 	}
 	void CDownAVListMcAdapterFix::getView(int position, SWindow * pItem,pugi::xml_node xmlTemplate)
 	{
@@ -244,13 +272,29 @@ namespace SOUI
 			 } 
              pWin= pItem->FindChildByName(L"btn_pause");
 			 if(pWin){
-							
+				
 			 }
+
              pWin= pItem->FindChildByName(L"btn_delete");
 			 if(pWin){
 				     pWin->SetUserData(position);
 					 pWin->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CDownAVListMcAdapterFix::OnItemDelete, this));
 			 }
+
+             pWin= pItem->FindChildByName(L"btn_openlocate");
+			 if(pWin){
+				 pWin->SetUserData(position);
+				 if(Item.savefilepath.length()>2)
+				 {
+				    pWin->SetAttribute(L"tip",Item.savefilepath.c_str());
+					pWin->SetVisible(1);
+					pWin->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CDownAVListMcAdapterFix::OnItemOpenLocal,this));
+				 }else{
+				    pWin->SetVisible(0);
+					//ShellExecute(NULL,NULL,_T("explorer"), "/select, "+strFilePath,NULL,SW_SHOW); 
+				 }
+			 }
+			 
 	   }
 	   ::free(temp2);
 	   ::free(temp);

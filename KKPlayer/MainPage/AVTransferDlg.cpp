@@ -5,7 +5,7 @@
 #include "../Control/kkmclv.h"
 namespace SOUI
 {
-	CAVTransferDlg::CAVTransferDlg(CMainDlg *pDlgMain): SDomodalwnd(_T("LAYOUT:XML_AVDownManage"),0),m_pDlgMain(pDlgMain)
+	CAVTransferDlg::CAVTransferDlg(CMainDlg *pDlgMain): SDomodalwnd(_T("LAYOUT:XML_AVDownManage"),0,1,WS_EX_TOOLWINDOW),m_pDlgMain(pDlgMain)
 	{
         
 	}
