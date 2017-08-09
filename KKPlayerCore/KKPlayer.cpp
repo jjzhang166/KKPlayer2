@@ -1965,6 +1965,11 @@ void KKPlayer::ReadAV()
 					   cmd=argv[i];
 					   av_dict_set(&format_opts, "fflags", cmd, 0);
 					}
+				}else if(0==strcmp(cmd,"-max_delay")){
+					if (++i < argc){
+					   cmd=argv[i];
+					   av_dict_set(&format_opts, "max_delay", cmd, 0);
+					}
 				}
 		 }
 		 free(argv);

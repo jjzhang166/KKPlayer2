@@ -18,7 +18,7 @@
 #include "KKLock.h"
 #include "KKVideoInfo.h"
 #include "KKPlugin.h"
-
+#include <string>
 #ifndef KKPlayer_H_
 #define KKPlayer_H_
 
