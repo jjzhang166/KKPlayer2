@@ -79,6 +79,7 @@
     <None Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="kkRtpUdpTransort.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="rtpwintest.h" />
     <ClInclude Include="rtp_Test.h" />
@@ -86,6 +87,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="kkRtpUdpTransort.cpp" />
     <ClCompile Include="rtpwintest.cpp" />
     <ClCompile Include="rtp_Test.cpp" />
     <ClCompile Include="stdafx.cpp">

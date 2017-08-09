@@ -39,6 +39,9 @@
     <ClInclude Include="rtp_Test.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="kkRtpUdpTransort.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -48,6 +51,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="rtp_Test.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="kkRtpUdpTransort.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
