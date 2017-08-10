@@ -18,7 +18,6 @@
 
 #include "rtp_utility.h"
 #include "../system_wrappers/interface/critical_section_wrapper.h"
-#include "../system_wrappers/interface/logging.h"
 
 namespace webrtc {
 
@@ -45,7 +44,7 @@ void RTPPacketHistory::SetStorePacketsStatus(bool enable,
   CriticalSectionScoped cs(critsect_);
   if (enable) {
     if (store_) {
-      LOG(LS_WARNING) << "Purging packet history in order to re-set status.";
+      //"Purging packet history in order to re-set status.";
       Free();
     }
     Allocate(number_to_store);
@@ -131,8 +130,8 @@ int32_t RTPPacketHistory::PutRTPPacket(const uint8_t* packet,
   VerifyAndAllocatePacketLength(max_packet_length);
 
   if (packet_length > max_packet_length_) {
-    LOG(LS_WARNING) << "Failed to store RTP packet with length: "
-                    << packet_length;
+    // "Failed to store RTP packet with length: "
+      //              << packet_length;
     return -1;
   }
 
@@ -192,15 +191,15 @@ bool RTPPacketHistory::GetPacketAndSetSendTime(uint16_t sequence_number,
   int32_t index = 0;
   bool found = FindSeqNum(sequence_number, &index);
   if (!found) {
-    LOG(LS_WARNING) << "No match for getting seqNum " << sequence_number;
+   //"No match for getting seqNum " << sequence_number;
     return false;
   }
 
   size_t length = stored_lengths_.at(index);
   assert(length <= max_packet_length_);
   if (length == 0) {
-    LOG(LS_WARNING) << "No match for getting seqNum " << sequence_number
-                    << ", len " << length;
+    //"No match for getting seqNum " << sequence_number
+                 // ", len " << length;
     return false;
   }
 

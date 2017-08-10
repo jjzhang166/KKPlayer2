@@ -17,7 +17,7 @@
 
 #include "../base/common.h"
 #include "httpbase.h"
-#include "../base/logging.h"
+
 #include "../socket/socket.h"
 #include "../base/stringutils.h"
 #include "../base/thread.h"

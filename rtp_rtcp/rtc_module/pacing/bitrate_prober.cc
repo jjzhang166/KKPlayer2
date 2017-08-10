@@ -14,7 +14,6 @@
 #include <limits>
 #include <sstream>
 
-#include "../../system_wrappers/interface/logging.h"
 
 namespace webrtc {
 
@@ -38,11 +37,11 @@ void BitrateProber::SetEnabled(bool enable) {
   if (enable) {
     if (probing_state_ == kDisabled) {
       probing_state_ = kAllowedToProbe;
-      LOG(LS_INFO) << "Initial bandwidth probing enabled";
+      //"Initial bandwidth probing enabled";
     }
   } else {
     probing_state_ = kDisabled;
-    LOG(LS_INFO) << "Initial bandwidth probing disabled";
+    // "Initial bandwidth probing disabled";
   }
 }
 

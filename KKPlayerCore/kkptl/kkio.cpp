@@ -5,6 +5,7 @@
 //};
 typedef unsigned long long uint64_t;
 #include "../KKVideoInfo.h"
+#include "../KKInternal.h"
 void Packet_Queue_All_Flush(SKK_VideoState *pVideoInfo);
 void Queue_All_Flush(void *pVideoInfo)
 {
@@ -15,13 +16,14 @@ void Queue_All_Flush(void *pVideoInfo)
 void CalPlayerDelay(void *opaque,int64_t Pts,int AVType)
 {
           SKK_VideoState *	is=	(SKK_VideoState *)opaque;
+		  double realtime=get_master_clock(is);
 		  if(is->audio_st!=NULL&& AVType==0)
 		  {
 			  double cupts= Pts * av_q2d(is->audio_st->time_base);
-			  is->nRealtimeDelay=cupts-is->audio_clock;
+			  is->nRealtimeDelay=realtime-is->audio_clock;
 		  }else if(is->video_st!=NULL&& AVType==1){
 			  double cupts= Pts * av_q2d(is->video_st->time_base);
-			  is->nRealtimeDelay=cupts-is->video_clock;
+			  is->nRealtimeDelay=realtime-is->video_clock;
 		  }else if(AVType==2){
              is->nCacheTime= Pts;
 		  }

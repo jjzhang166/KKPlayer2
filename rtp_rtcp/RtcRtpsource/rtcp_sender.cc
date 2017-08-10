@@ -19,7 +19,6 @@
 #include "../common_types.h"
 #include "rtp_rtcp_impl.h"
 #include "../system_wrappers/interface/critical_section_wrapper.h"
-#include "../system_wrappers/interface/logging.h"
 #include "../system_wrappers/interface/trace_event.h"
 
 namespace webrtc {
@@ -306,8 +305,6 @@ int32_t RTCPSender::SetCameraDelay(int32_t delayMS) {
     CriticalSectionScoped lock(_criticalSectionRTCPSender);
     if(delayMS > 1000 || delayMS < -1000)
     {
-        LOG(LS_WARNING) << "Delay can't be larger than 1 second: "
-                        << delayMS << " ms";
         return -1;
     }
     _cameraDelayMS = delayMS;
@@ -501,7 +498,6 @@ int32_t RTCPSender::AddReportBlock(
   assert(reportBlock);
 
   if (report_blocks->size() >= RTCP_MAX_REPORT_BLOCKS) {
-    LOG(LS_WARNING) << "Too many report blocks.";
     return -1;
   }
   std::map<uint32_t, RTCPReportBlock*>::iterator it =
@@ -539,7 +535,6 @@ int32_t RTCPSender::BuildSR(const FeedbackState& feedback_state,
     // sanity
     if(pos + 52 >= IP_PACKET_SIZE)
     {
-        LOG(LS_WARNING) << "Failed to build Sender Report.";
         return -2;
     }
     uint32_t RTPtime;
@@ -618,7 +613,7 @@ int32_t RTCPSender::BuildSDEC(uint8_t* rtcpbuffer, int& pos) {
 
   // sanity
   if(pos + 12 + lengthCname  >= IP_PACKET_SIZE) {
-    LOG(LS_WARNING) << "Failed to build SDEC.";
+   
     return -2;
   }
   // SDEC Source Description
@@ -767,9 +762,6 @@ RTCPSender::BuildExtendedJitterReport(
 {
     if (external_report_blocks_.size() > 0)
     {
-        // TODO(andresp): Remove external report blocks since they are not
-        // supported.
-        LOG(LS_ERROR) << "Handling of external report blocks not implemented.";
         return 0;
     }
 
@@ -1169,7 +1161,6 @@ RTCPSender::BuildTMMBN(uint8_t* rtcpbuffer, int& pos)
     // sanity
     if(pos + 12 + boundingSet->lengthOfSet()*8 >= IP_PACKET_SIZE)
     {
-        LOG(LS_WARNING) << "Failed to build TMMBN.";
         return -2;
     }
     uint8_t FMT = 4;
@@ -1236,12 +1227,12 @@ RTCPSender::BuildAPP(uint8_t* rtcpbuffer, int& pos)
     // sanity
     if(_appData == NULL)
     {
-        LOG(LS_WARNING) << "Failed to build app specific.";
+   
         return -1;
     }
     if(pos + 12 + _appLength >= IP_PACKET_SIZE)
     {
-        LOG(LS_WARNING) << "Failed to build app specific.";
+    
         return -2;
     }
     rtcpbuffer[pos++]=(uint8_t)0x80 + _appSubType;
@@ -1275,7 +1266,7 @@ int32_t RTCPSender::BuildNACK(uint8_t* rtcpbuffer,
     // sanity
     if(pos + 16 >= IP_PACKET_SIZE)
     {
-        LOG(LS_WARNING) << "Failed to build NACK.";
+      
         return -2;
     }
 
@@ -1327,7 +1318,7 @@ int32_t RTCPSender::BuildNACK(uint8_t* rtcpbuffer,
     rtcpbuffer[nackSizePos] = static_cast<uint8_t>(2 + numOfNackFields);
 
     if (i != nackSize) {
-      LOG(LS_WARNING) << "Nack list too large for one packet.";
+   
     }
 
     // Report stats.
@@ -1554,7 +1545,7 @@ int32_t RTCPSender::SendRTCP(const FeedbackState& feedback_state,
     CriticalSectionScoped lock(_criticalSectionRTCPSender);
     if(_method == kRtcpOff)
     {
-        LOG(LS_WARNING) << "Can't send rtcp if it is disabled.";
+        //"Can't send rtcp if it is disabled.";
         return -1;
     }
   }
@@ -1968,7 +1959,7 @@ int32_t RTCPSender::SetApplicationSpecificData(uint8_t subType,
                                                uint16_t length) {
     if(length %4 != 0)
     {
-        LOG(LS_ERROR) << "Failed to SetApplicationSpecificData.";
+        //"Failed to SetApplicationSpecificData.";
         return -1;
     }
     CriticalSectionScoped lock(_criticalSectionRTCPSender);
@@ -2016,7 +2007,7 @@ int32_t RTCPSender::WriteAllReportBlocksToBuffer(uint8_t* rtcpbuffer,
   numberOfReportBlocks = external_report_blocks_.size();
   numberOfReportBlocks += internal_report_blocks_.size();
   if ((pos + numberOfReportBlocks * 24) >= IP_PACKET_SIZE) {
-    LOG(LS_WARNING) << "Can't fit all report blocks.";
+    //"Can't fit all report blocks.";
     return -1;
   }
   pos = WriteReportBlocksToBuffer(rtcpbuffer, pos, internal_report_blocks_);

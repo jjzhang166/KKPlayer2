@@ -18,7 +18,7 @@
 #include <string>
 
 #include "../base/base64.h"
-#include "../base/logging.h"
+
 #include "sslconfig.h"
 
 #if SSL_USE_SCHANNEL

@@ -16,7 +16,7 @@
 #include "../base/common.h"
 #include "../base/diskcache.h"
 #include "httpclient.h"
-#include "../base/logging.h"
+
 #include "../base/pathutils.h"
 #include "../base/scoped_ptr.h"
 #include "../socket/socketstream.h"

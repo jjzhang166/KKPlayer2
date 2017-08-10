@@ -27,7 +27,7 @@
 #include "../base/bytebuffer.h"
 #include "../base/common.h"
 #include "../rtchttp/httpcommon.h"
-#include "../base/logging.h"
+
 #include "socketadapters.h"
 #include "../base/stringencode.h"
 #include "../base/stringutils.h"

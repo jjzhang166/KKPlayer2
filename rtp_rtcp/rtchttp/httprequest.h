@@ -12,7 +12,7 @@
 #define _HTTPREQUEST_H_
 
 #include "httpclient.h"
-#include "../base/logging.h"
+
 #include "proxyinfo.h"
 #include "../socket/socketserver.h"
 #include "../base/thread.h"

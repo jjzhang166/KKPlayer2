@@ -20,6 +20,7 @@ double compute_target_delay(double delay, SKK_VideoState *is);
 void update_video_pts(SKK_VideoState *is, double pts, int64_t pos, int serial);
 SKK_Frame *frame_queue_peek_next(SKK_FrameQueue *f);
 double get_clock(SKK_Clock *c);
+void check_external_clock_speed(SKK_VideoState *is);
 int get_master_sync_type(SKK_VideoState *is);
 double get_master_clock(SKK_VideoState *is);
 /* seek in the stream */

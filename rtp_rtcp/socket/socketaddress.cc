@@ -29,7 +29,6 @@
 
 #include "../base/byteorder.h"
 #include "../base/common.h"
-#include "../base/logging.h"
 #include "nethelpers.h"
 
 #if defined(WEBRTC_WIN)

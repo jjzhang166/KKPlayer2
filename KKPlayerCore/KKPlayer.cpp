@@ -21,7 +21,8 @@ static int framedrop = -1;
 static int fast = 0;
 static int lowres = 0;
 static int64_t sws_flags = SWS_BICUBIC;
-static int av_sync_type =AV_SYNC_AUDIO_MASTER;//AV_SYNC_EXTERNAL_CLOCK;//AV_SYNC_AUDIO_MASTER;//AV_SYNC_VIDEO_MASTER;// AV_SYNC_AUDIO_MASTER;
+static int av_sync_type =AV_SYNC_EXTERNAL_CLOCK;
+//AV_SYNC_AUDIO_MASTER;//AV_SYNC_EXTERNAL_CLOCK;//AV_SYNC_AUDIO_MASTER;//AV_SYNC_VIDEO_MASTER;// AV_SYNC_AUDIO_MASTER;
 double rdftspeed = 0.02;
 char**  KKCommandLineToArgv(const char* CmdLine,int* _argc);
 //extern AVPixelFormat DstAVff;//=AV_PIX_FMT_YUV420P;//AV_PIX_FMT_BGRA;
@@ -594,11 +595,14 @@ void KKPlayer::video_image_refresh(SKK_VideoState *is)
 	
 	
     double time=0,duration=0;
-	if(is->audio_st)
+
+	 if (!is->paused && get_master_sync_type(is) == AV_SYNC_EXTERNAL_CLOCK && is->realtime)
+           check_external_clock_speed(is);
+	/*if(is->audio_st)
 	    m_CurTime=is->audio_clock;
 	else if(is->video_st)
 		m_CurTime=is->vidclk.pts;
-	else
+	else*/
 		m_CurTime=get_master_clock(is);
 	if (is->video_st==NULL&&is->audio_st) {
 		time = av_gettime_relative() / 1000000.0;
@@ -1821,6 +1825,17 @@ void KKPlayer::AvDelayParser()
 {
 
 	int pkgsize=pVideoInfo->audioq.size+pVideoInfo->videoq.size;
+
+
+	/*if(pVideoInfo->audioq.size>2000&&pVideoInfo->videoq.size>2000)
+	{
+	AvflushRealTime(1);
+	AvflushRealTime(2);
+	AvflushRealTime(3);
+	}*/
+
+	
+	LOGE_KK("de %.3fs,que audioq:%d,videoq:%d,subtitleq:%d \n",pVideoInfo->nRealtimeDelay,pVideoInfo->audioq.size,pVideoInfo->videoq.size,pVideoInfo->subtitleq.size);
 	///ÓÐÒôÆµÓÐÊÓÆµ
 	if(pVideoInfo->NeedWait&&pVideoInfo->audio_st!=NULL){
 			if(pVideoInfo->audioq.size==0||pVideoInfo->videoq.size==0){
@@ -1984,12 +1999,12 @@ void KKPlayer::ReadAV()
 	err =avformat_open_input(&pFormatCtx,pVideoInfo->filename,pVideoInfo->iformat,   &format_opts);
     
 	if(pFormatCtx!=0&&(strncmp(pVideoInfo->filename, "rtmp:",5)==0||strncmp(pVideoInfo->filename, "rtsp:",5)==0)){
-		pFormatCtx->probesize = 100 *1024;
-		pFormatCtx->max_analyze_duration=5 * AV_TIME_BASE;
-		double  dx2=av_gettime ()/1000/1000-pVideoInfo->OpenTime;
+		pFormatCtx->probesize =1024;
+		pFormatCtx->max_analyze_duration=1;//AV_TIME_BASE;
+		/*double  dx2=av_gettime ()/1000/1000-pVideoInfo->OpenTime;
         if(dx2>MaxTimeOut){
 		    err=-1;
-		}
+		}*/
 	}
 	
 	LOGE_KK("avformat_open_input=%d,%s \n",err,pVideoInfo->filename);

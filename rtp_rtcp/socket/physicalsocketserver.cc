@@ -42,7 +42,7 @@
 #include "../base/basictypes.h"
 #include "../base/byteorder.h"
 #include "../base/common.h"
-#include "../base/logging.h"
+
 #include "nethelpers.h"
 #include "physicalsocketserver.h"
 #include "../base/timeutils.h"
@@ -1120,7 +1120,7 @@ class SocketDispatcher : public Dispatcher, public PhysicalSocket {
     // something like a READ followed by a CONNECT, which would be odd.
     if (((ff & DE_CONNECT) != 0) && (id_ == cache_id)) {
       if (ff != DE_CONNECT)
-        LOG(LS_VERBOSE) << "Signalled with DE_CONNECT: " << ff;
+        //"Signalled with DE_CONNECT: " << ff;
       enabled_events_ &= ~DE_CONNECT;
 #ifdef _DEBUG
       dbg_addr_ = "Connected @ ";
@@ -1271,8 +1271,8 @@ void PhysicalSocketServer::Remove(Dispatcher *pdispatcher) {
   // the (expected) symmetric calls to Remove. Note that this may still hide
   // a real issue, so we at least log a warning about it.
   if (pos == dispatchers_.end()) {
-    LOG(LS_WARNING) << "PhysicalSocketServer asked to remove a unknown "
-                    << "dispatcher, potentially from a duplicate call to Add.";
+    // "PhysicalSocketServer asked to remove a unknown "
+     // "dispatcher, potentially from a duplicate call to Add.";
     return;
   }
   size_t index = pos - dispatchers_.begin();
@@ -1356,7 +1356,7 @@ bool PhysicalSocketServer::Wait(int cmsWait, bool process_io) {
     // If error, return error.
     if (n < 0) {
       if (errno != EINTR) {
-        LOG_E(LS_ERROR, EN, errno) << "select";
+        //LOG_E(LS_ERROR, EN, errno) << "select";
         return false;
       }
       // Else ignore the error and keep going. If this EINTR was for one of the

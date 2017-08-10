@@ -14,7 +14,6 @@
 #include <string.h>
 
 #include "../common_types.h"
-#include "../system_wrappers/interface/logging.h"
 #include "../system_wrappers/interface/trace.h"
 
 #ifdef _WIN32
@@ -197,10 +196,9 @@ int32_t ModuleRtpRtcpImpl::Process() {
       // is increasing.
       int64_t rtcp_interval = RtcpReportInterval();
       if (rtcp_receiver_.RtcpRrTimeout(rtcp_interval)) {
-        LOG_F(LS_WARNING) << "Timeout: No RTCP RR received.";
+        // "Timeout: No RTCP RR received.";
       } else if (rtcp_receiver_.RtcpRrSequenceNumberTimeout(rtcp_interval)) {
-        LOG_F(LS_WARNING) <<
-            "Timeout: No increase in RTCP RR extended highest sequence number.";
+       //"Timeout: No increase in RTCP RR extended highest sequence number.";
       }
 
       if (remote_bitrate_ && rtcp_sender_.TMMBR()) {
@@ -267,7 +265,7 @@ int32_t ModuleRtpRtcpImpl::IncomingRtcpPacket(
 
   const bool valid_rtcpheader = rtcp_parser.IsValid();
   if (!valid_rtcpheader) {
-    LOG(LS_WARNING) << "Incoming invalid RTCP packet";
+    // "Incoming invalid RTCP packet";
     return -1;
   }
   RTCPHelp::RTCPPacketInformation rtcp_packet_information;
@@ -433,7 +431,7 @@ int32_t ModuleRtpRtcpImpl::SetSendingStatus(const bool sending) {
   if (rtcp_sender_.Sending() != sending) {
     // Sends RTCP BYE when going from true to false
     if (rtcp_sender_.SetSendingStatus(GetFeedbackState(), sending) != 0) {
-      LOG(LS_WARNING) << "Failed to send RTCP BYE";
+      // "Failed to send RTCP BYE";
     }
 
     collision_detected_ = false;
@@ -683,7 +681,7 @@ int32_t ModuleRtpRtcpImpl::SetTransportOverhead(
 
 int32_t ModuleRtpRtcpImpl::SetMaxTransferUnit(const uint16_t mtu) {
   if (mtu > IP_PACKET_SIZE) {
-    LOG(LS_ERROR) << "Invalid mtu: " << mtu;
+    // "Invalid mtu: " << mtu;
     return -1;
   }
   return rtp_sender_.SetMaxPayloadLength(mtu - packet_overhead_,
