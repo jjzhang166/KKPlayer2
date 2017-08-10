@@ -417,7 +417,6 @@ DELXXX:
 	   while (frame_queue_nb_remaining(&is->sampq) <= 0) {
 		   if ((av_gettime_relative() - is->audio_callback_time) > 1000000LL * is->audio_hw_buf_size / is->audio_tgt.bytes_per_sec / 2)
 			   return -1;
-		   av_usleep (5000);
 	   }
 #else
 	    if(frame_queue_nb_remaining(&is->sampq) <= 0) 
@@ -598,6 +597,7 @@ void audio_callback(void *userdata, char *stream, int len)
 	int slen=len;
 	//获取现在的时间
 	pVideoInfo->audio_callback_time = av_gettime_relative();
+	int silencelen=0;
 	while (len > 0) 
 	{
 		if (pVideoInfo->audio_buf_index >= pVideoInfo->audio_buf_size) 
@@ -607,6 +607,7 @@ void audio_callback(void *userdata, char *stream, int len)
 			{
 				pVideoInfo->audio_buf = pVideoInfo->silence_buf;
                 pVideoInfo->audio_buf_size =512 / pVideoInfo->audio_tgt.frame_size * pVideoInfo->audio_tgt.frame_size;
+				silencelen+=512;
 			  
 			} else 
 			{		
@@ -631,6 +632,8 @@ void audio_callback(void *userdata, char *stream, int len)
 	pVideoInfo->audio_write_buf_size = pVideoInfo->audio_buf_size - pVideoInfo->audio_buf_index;
 	if (!isNAN(pVideoInfo->audio_clock)) 
 	{
+		double sle=(double)(2 * silencelen)/ pVideoInfo->audio_tgt.bytes_per_sec;
+		pVideoInfo->nRealtimeDelay+=sle;
 		set_clock_at(&pVideoInfo->audclk,     
 			pVideoInfo->audio_clock - (double)(2 * pVideoInfo->audio_hw_buf_size + pVideoInfo->audio_write_buf_size) / pVideoInfo->audio_tgt.bytes_per_sec, 
 			pVideoInfo->audio_clock_serial, 

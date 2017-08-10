@@ -21,8 +21,7 @@ static int framedrop = -1;
 static int fast = 0;
 static int lowres = 0;
 static int64_t sws_flags = SWS_BICUBIC;
-static int av_sync_type =AV_SYNC_EXTERNAL_CLOCK;
-//AV_SYNC_AUDIO_MASTER;//AV_SYNC_EXTERNAL_CLOCK;//AV_SYNC_AUDIO_MASTER;//AV_SYNC_VIDEO_MASTER;// AV_SYNC_AUDIO_MASTER;
+static int av_sync_type =AV_SYNC_AUDIO_MASTER;//AV_SYNC_EXTERNAL_CLOCK;//AV_SYNC_AUDIO_MASTER;//AV_SYNC_VIDEO_MASTER;// AV_SYNC_AUDIO_MASTER;
 double rdftspeed = 0.02;
 char**  KKCommandLineToArgv(const char* CmdLine,int* _argc);
 //extern AVPixelFormat DstAVff;//=AV_PIX_FMT_YUV420P;//AV_PIX_FMT_BGRA;
@@ -1827,7 +1826,7 @@ void KKPlayer::AvDelayParser()
 	int pkgsize=pVideoInfo->audioq.size+pVideoInfo->videoq.size;
 
 
-	/*if(pVideoInfo->audioq.size>2000&&pVideoInfo->videoq.size>2000)
+	/*if(pVideoInfo->audioq.size>20000&&pVideoInfo->videoq.size>20000)
 	{
 	AvflushRealTime(1);
 	AvflushRealTime(2);
@@ -1958,12 +1957,12 @@ void KKPlayer::ReadAV()
         //rtmp 不支持 timeout
 		av_dict_set(&format_opts, "rw_timeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
 		av_dict_set(&format_opts, "fflags", "-nobuffer ", 0);
-		av_dict_set(&format_opts, "max_delay","500",0);
+		av_dict_set(&format_opts, "max_delay","50",0);
 	}else if(!strncmp(pVideoInfo->filename, "rtsp:",5)){
 		av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
        // av_dict_set(&format_opts, "stimeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
 		 av_dict_set(&format_opts, "fflags","nobuffer", 0);
-		 av_dict_set(&format_opts, "max_delay","500",0);
+		 av_dict_set(&format_opts, "max_delay","50",0);
 	}
 	///命令行选项
 	if(m_strcmd.length()>1)
