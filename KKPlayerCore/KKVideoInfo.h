@@ -362,8 +362,9 @@ typedef struct SKK_VideoState
 	double nRealtimeDelay;
 
 	/********最大延迟********/
-	int nMaxRealtimeDelay;
-	/********最小延迟********/
+	double nMaxRealtimeDelay;
+
+	/********延迟丢帧统计********/
 	int nRealtimeDelayCount;
 
 	/********缓冲时间*********/

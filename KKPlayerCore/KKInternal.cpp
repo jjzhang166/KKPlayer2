@@ -395,7 +395,7 @@ int frame_queue_init(SKK_FrameQueue *f, SKK_PacketQueue *pktq, int max_size, int
 int audio_fill_frame( SKK_VideoState *pVideoInfo) 
 { 
 
-	
+	bool Afterdelay=false;
 DELXXX:
 	int n=0;
 	AVCodecContext *aCodecCtx=pVideoInfo->auddec.avctx;	
@@ -546,10 +546,16 @@ DELXXX:
 		 if(data_size>0&&!is->abort_request&&is->realtime&&!is->abort_request)
 		 {
 			
-			 if(pVideoInfo->nRealtimeDelay>is->nMaxRealtimeDelay)
+			 if(pVideoInfo->nRealtimeDelay>is->nMaxRealtimeDelay||Afterdelay)
 			 { 
 				 pVideoInfo->nRealtimeDelay-=ll;
 				 is->nRealtimeDelayCount++;
+				 Afterdelay=true;
+				 if(pVideoInfo->nRealtimeDelay<=0.0000001)
+				 {
+				     pVideoInfo->nRealtimeDelay=0.0000001;
+					  Afterdelay=false;
+				 }
 				 goto DELXXX;
 			 }else{
 				 is->nRealtimeDelayCount=0;
@@ -633,7 +639,7 @@ void audio_callback(void *userdata, char *stream, int len)
 	if (!isNAN(pVideoInfo->audio_clock)) 
 	{
 		double sle=(double)(2 * silencelen)/ pVideoInfo->audio_tgt.bytes_per_sec;
-		pVideoInfo->nRealtimeDelay+=sle;
+		//pVideoInfo->nRealtimeDelay+=sle;
 		set_clock_at(&pVideoInfo->audclk,     
 			pVideoInfo->audio_clock - (double)(2 * pVideoInfo->audio_hw_buf_size + pVideoInfo->audio_write_buf_size) / pVideoInfo->audio_tgt.bytes_per_sec, 
 			pVideoInfo->audio_clock_serial, 

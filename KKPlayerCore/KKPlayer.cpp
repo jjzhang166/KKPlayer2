@@ -617,6 +617,7 @@ void KKPlayer::video_image_refresh(SKK_VideoState *is)
 	
 	if(is->video_st)
     {
+		    bool Afterdelay=false;
 retry:
 			//没有数据
 			if (frame_queue_nb_remaining(&is->pictq) <= 0)
@@ -636,18 +637,22 @@ retry:
 			vp = frame_queue_peek(&is->pictq);
 			is->video_clock=vp->pts;
 			if(is->realtime&&is->audio_st==NULL&&!is->abort_request){
-				if(pVideoInfo->nRealtimeDelay>0)
-				{
 				
-					pVideoInfo->nRealtimeDelay-=(vp->pts-lastvp->pts);
 					//is->nMinRealtimeDelay=3;
-					if(pVideoInfo->nRealtimeDelay>is->nMaxRealtimeDelay)
-					{
+					if(pVideoInfo->nRealtimeDelay>is->nMaxRealtimeDelay|| Afterdelay)
+					{    pVideoInfo->nRealtimeDelay-=(vp->pts-lastvp->pts);
 						frame_queue_next(&is->pictq,true);
 						is->nRealtimeDelayCount++;
+						 Afterdelay=true;
+						 if(pVideoInfo->nRealtimeDelay<=0.0000001)
+						 {
+							 pVideoInfo->nRealtimeDelay=0.0000001;
+							  Afterdelay=false;
+						 }
+
 						goto retry;
-						//goto retry:
-					}else
+						
+					}else{
 						is->nRealtimeDelayCount=0;
 				}
 			}
@@ -1367,7 +1372,7 @@ int KKPlayer::OpenMedia(const char* URL,const char* Other)
 	pVideoInfo->realtime = is_realtime2(URL);
     if(pVideoInfo->realtime)
 	{
-	   pVideoInfo->NeedWait=true;
+	   pVideoInfo->NeedWait=false;
 	}
 	memset(&m_AVPlayInfo,0,sizeof(MEDIA_INFO));
 	//初始化队列
@@ -1433,6 +1438,7 @@ int KKPlayer::OpenMedia(const char* URL,const char* Other)
 	pVideoInfo->OutAudioSink=NULL;
 	pVideoInfo->AudioGraph=NULL;
 	m_nhasVideoAudio=0;
+	m_nOpenTime=::av_gettime()/1000000;
 	LOGE_KK("创建线程\n");
 #ifdef WIN32_KK
 	m_ReadThreadInfo.ThreadHandel=(HANDLE)_beginthreadex(NULL, NULL, ReadAV_thread, (LPVOID)this, 0,&m_ReadThreadInfo.Addr);
@@ -1913,6 +1919,7 @@ void KKPlayer::ReadAV()
 {
 	
 	//rtmp://117.135.131.98/771/003 live=1
+	double  Opentime1=av_gettime () / 1000000;
 	m_PlayerLock.Lock();
 	m_ReadThreadInfo.ThOver=false;
 	LOGE_KK("ReadAV thread start \n");
@@ -1959,10 +1966,10 @@ void KKPlayer::ReadAV()
 		av_dict_set(&format_opts, "fflags", "-nobuffer ", 0);
 		av_dict_set(&format_opts, "max_delay","50",0);
 	}else if(!strncmp(pVideoInfo->filename, "rtsp:",5)){
-		av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
-       // av_dict_set(&format_opts, "stimeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
+		 av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
+         av_dict_set(&format_opts, "stimeout", "30000000", AV_DICT_MATCH_CASE);
 		 av_dict_set(&format_opts, "fflags","nobuffer", 0);
-		 av_dict_set(&format_opts, "max_delay","50",0);
+		 av_dict_set(&format_opts, "max_delay","10",0);
 	}
 	///命令行选项
 	if(m_strcmd.length()>1)
@@ -2152,7 +2159,10 @@ void KKPlayer::ReadAV()
 		pVideoInfo->show_mode=  SKK_VideoState::SHOW_MODE_WAVES;
 	}
 	
-
+//rtsp://127.0.0.1:554/stream0.sdp
+	
+	pVideoInfo->nMaxRealtimeDelay=0.5;
+	//pVideoInfo->nRealtimeDelay= 3;//Opentime2- m_nOpenTime;
 	while(m_bOpen) 
 	{
 		if(pVideoInfo->abort_request)
@@ -2419,10 +2429,22 @@ void KKPlayer::ReadAV()
 		if (pkt->stream_index == pVideoInfo->audio_stream && pkt_in_play_range&&pkt->data!=NULL) {
 			packet_queue_put(&pVideoInfo->audioq, pkt,pVideoInfo->pflush_pkt,pVideoInfo->segid);
 			
+			int lx=pVideoInfo->audio_clock;
+			
+			
 			m_AVCacheInfo.AudioSize=pVideoInfo->audioq.PktMemSize;
 			if(pVideoInfo->audio_st!=NULL)
 			{
-				pkt_ts=pkt_ts*av_q2d(pVideoInfo->audio_st->time_base);
+			    double pkt_ts2=pkt_ts*av_q2d(pVideoInfo->audio_st->time_base);
+				
+				if(pkt_ts2>1)
+				{
+					double ss=((double)av_gettime () / 1000000)  -m_nOpenTime ;
+
+				    pVideoInfo->nRealtimeDelay=ss-pVideoInfo->audio_clock;
+				}
+				LOGE_KK("audio ms ret=%lf",pkt_ts2);
+			   LOGE_KK(", %lf \n",pVideoInfo->audio_clock);
 			}
 			if(m_AVCacheInfo.MaxTime<pkt_ts)
 			{
@@ -2438,6 +2460,21 @@ void KKPlayer::ReadAV()
 			m_AVCacheInfo.VideoSize=pVideoInfo->videoq.PktMemSize;
 			if(pVideoInfo->video_st!=NULL){
 				pkt_ts=pkt_ts*av_q2d(pVideoInfo->video_st->time_base);
+
+				if(pVideoInfo->audio_st==NULL)
+				{
+					double pkt_ts2=pkt_ts*av_q2d(pVideoInfo->video_st->time_base);
+					
+					//if(pkt_ts2>1)
+					{
+						double ss=((double)av_gettime () / 1000000)  -m_nOpenTime ;
+
+						pVideoInfo->nRealtimeDelay=ss-pVideoInfo->video_clock;
+					}
+					LOGE_KK("pVideoInfo->nRealtimeDelay =%lf \n",pVideoInfo->nRealtimeDelay);
+				 
+				}
+
 			}
 			if(m_AVCacheInfo.MaxTime<pkt_ts)
 			{

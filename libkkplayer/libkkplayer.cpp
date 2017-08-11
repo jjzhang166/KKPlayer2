@@ -82,7 +82,7 @@ extern "C"{
 		 }
    }	
 
-   void  __declspec(dllexport) SetMaxRealtimeDelay(void* player,int Delay)
+   void  __declspec(dllexport) SetMaxRealtimeDelay(void* player,double Delay)
    {
         CMainFrame *Player = static_cast<CMainFrame *>(player);
 		if(Player!=NULL){

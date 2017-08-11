@@ -21,7 +21,7 @@ typedef  void (*fpKKCloseMedia)   (void* player);
 typedef  void (*fpSetKKVolume)    (void* player,int volume,bool tip);
 typedef  void (*fpKKDelPlayer)    (void* player,bool dui);
 typedef  void (*fpKKSetErrNotify) (void* player,fpKKPlayerErrNotify noti,void* UserData);
-typedef  void (*fpSetMaxRealtimeDelay)(void* player,int Delay);
+typedef  void (*fpSetMaxRealtimeDelay)(void* player,double Delay);
 class CKKPlayer: public IAVPlayer
 {
 public:
@@ -43,7 +43,7 @@ public:
 		void    RefreshDuiPlayer();
         void    DuiSize(int w,int h);
 
-		void    SetMaxRealtimeDelay(int Delay);
+		void    SetMaxRealtimeDelay(double Delay);
 public:
 	    HWND m_hWnd;
 private:
