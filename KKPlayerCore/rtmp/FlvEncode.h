@@ -18,9 +18,9 @@ typedef struct _FLV_TAG_HEADER
 	int  PreTagLen;  /*******上一个Tag长度********/         //   4
     char TagType;   //音频（0x8），视频（0x9），脚本（0x12）  //  1
 	char TagDtatLen[3];    /*******数据区长度*******/         // 3
-    char Timestamp[3];//时间戳                               //  3
+    char Timestamp[3];   //时间戳                               //  3
 	char ExpandTimeStamp;//是扩展时间戳                      //  1
-	char streamID[3];//streamID，但是总为0                   //  3
+	char streamID[3];    //streamID，但是总为0                   //  3
 }FLV_TAG_HEADER;
 
 typedef struct _METADATA
@@ -83,6 +83,13 @@ typedef struct _AVC_DEC_CON_REC
 }AVC_DEC_CON_REC;
 
 #pragma pack(pop)
+
+struct flv_packet
+{
+      unsigned  char *buf;
+	  int             bufLen;
+	  int taglen;
+};
 class FlvEncode
 {
 public:
@@ -93,9 +100,12 @@ public:
 		
 		 void *CreateFLVMetaData(METADATA *lpMetaData,int &OutLen);
 		 void *FlvMemcpy(void* dest,size_t destLen, const void* src, size_t n);
-		 int GetNALULen(char *src,int srcLen);
+		 int GetNALULen(const unsigned  char *src,int srcLen);
 		 //获取h264分割符长度
-		 int GetH264SeparatorLen(char *src,int srcLen);
+		 int GetH264SeparatorLen(const unsigned  char *src,int srcLen);
+         flv_packet GetFlvHeader();
+		 flv_packet GetVideoPacket(const unsigned  char *src,int srcLen,unsigned int pts,int &nPreTagLen);
+		 
 };
 }
 #endif

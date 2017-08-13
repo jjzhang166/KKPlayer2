@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\INTInclude;..\ffmpeg\include;..\librtmp;..\libmfx\include;..\libmfx\include\mfx"
+				AdditionalIncludeDirectories="..\INTInclude;..\ffmpeg\include;..\librtmp;..\libmfx\include;..\libmfx\include\mfx;../live555/liveMedia/includegroupsock/include;../live555/UsageEnvironment/include;../live555/BasicUsageEnvironment/include;../live555/groupsock/include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,6 +65,69 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)\$(ProjectName)d.lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="..\Release\libx86\"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="..\libmfx\include;..\libmfx\include\mfx;..\INTInclude;..\ffmpeg\include;..\librtmp;../live555/liveMedia/includegroupsock/include;../live555/UsageEnvironment/include;../live555/BasicUsageEnvironment/include;../live555/groupsock/include"
+				PreprocessorDefinitions="WIN32;KK_WIN32;_WINDOWS;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -129,69 +192,6 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)\$(ProjectName)d.lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="..\Release\libx86\"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
-			CharacterSet="1"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\libmfx\include;..\libmfx\include\mfx;..\INTInclude;..\ffmpeg\include;..\librtmp"
-				PreprocessorDefinitions="WIN32;KK_WIN32;_WINDOWS;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -504,6 +504,58 @@
 			>
 			<File
 				RelativePath=".\render\render.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="live555"
+			>
+			<File
+				RelativePath=".\live555\DummySink.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\DummySink.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555_rec_avbuf_que.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555_rec_avbuf_que.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555_rtsp_io.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555rtsp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555rtsp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\ourRTSPClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\ourRTSPClient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\StreamClientState.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\StreamClientState.h"
 				>
 			</File>
 		</Filter>

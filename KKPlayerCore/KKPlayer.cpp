@@ -13,6 +13,9 @@
 #include "rtmp/libRtmpPlugin.h"
 #include "MD5/md5.h"
 #include <string>
+
+
+
 #define MaxTimeOutStr "50000000"
 #define MaxTimeOut    45
 static AVPacket flush_pkt;
@@ -24,6 +27,7 @@ static int64_t sws_flags = SWS_BICUBIC;
 static int av_sync_type =AV_SYNC_AUDIO_MASTER;//AV_SYNC_EXTERNAL_CLOCK;//AV_SYNC_AUDIO_MASTER;//AV_SYNC_VIDEO_MASTER;// AV_SYNC_AUDIO_MASTER;
 double rdftspeed = 0.02;
 char**  KKCommandLineToArgv(const char* CmdLine,int* _argc);
+
 //extern AVPixelFormat DstAVff;//=AV_PIX_FMT_YUV420P;//AV_PIX_FMT_BGRA;
 //解码成BGRA格式
 void KKPlayer::SetBGRA()
@@ -91,6 +95,7 @@ std::list<KKPluginInfo>&   KKPlayer::GetKKPluginInfoList()
 	return KKPluginInfoList;
 }
 void register_Kkv();
+void AddLive555PluginInfo();
 KKPlayer::KKPlayer(IKKPlayUI* pPlayUI,IKKAudio* pSound):m_pSound(pSound),m_pPlayUI(pPlayUI),m_nPreFile(false)
 ,m_pAudioPicBuf(NULL)
 ,m_AudioPicBufLen(0)
@@ -122,6 +127,7 @@ KKPlayer::KKPlayer(IKKPlayUI* pPlayUI,IKKAudio* pSound):m_pSound(pSound),m_pPlay
 		
 		registerFF=false;
 		AddlibRtmpPluginInfo();
+		AddLive555PluginInfo();
 	}
 	
 #ifdef Android_Plat
@@ -1840,7 +1846,7 @@ void KKPlayer::AvDelayParser()
 	}*/
 
 	
-	LOGE_KK("de %.3fs,que audioq:%d,videoq:%d,subtitleq:%d \n",pVideoInfo->nRealtimeDelay,pVideoInfo->audioq.size,pVideoInfo->videoq.size,pVideoInfo->subtitleq.size);
+	//LOGE_KK("de %.3fs,que audioq:%d,videoq:%d,subtitleq:%d \n",pVideoInfo->nRealtimeDelay,pVideoInfo->audioq.size,pVideoInfo->videoq.size,pVideoInfo->subtitleq.size);
 	///有音频有视频
 	if(pVideoInfo->NeedWait&&pVideoInfo->audio_st!=NULL){
 			if(pVideoInfo->audioq.size==0||pVideoInfo->videoq.size==0){
@@ -1960,16 +1966,21 @@ void KKPlayer::ReadAV()
 	m_nPreFile=2;
 	m_AVInfoLock.Unlock();
 	
+
+	
+    ///openlive555rtsp(pVideoInfo->filename,"kkrtsp");
+
 	if(!strncmp(pVideoInfo->filename, "rtmp:",5)){
         //rtmp 不支持 timeout
 		av_dict_set(&format_opts, "rw_timeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
-		av_dict_set(&format_opts, "fflags", "-nobuffer ", 0);
+		av_dict_set(&format_opts, "fflags", "nobuffer ", 0);
 		av_dict_set(&format_opts, "max_delay","50",0);
 	}else if(!strncmp(pVideoInfo->filename, "rtsp:",5)){
 		 av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
          av_dict_set(&format_opts, "stimeout", "30000000", AV_DICT_MATCH_CASE);
 		 av_dict_set(&format_opts, "fflags","nobuffer", 0);
-		 av_dict_set(&format_opts, "max_delay","10",0);
+		 av_dict_set(&format_opts, "max_delay","0",0);
+		  av_dict_set(&format_opts, "analyzeduration","1000000",0);
 	}
 	///命令行选项
 	if(m_strcmd.length()>1)
@@ -2006,7 +2017,7 @@ void KKPlayer::ReadAV()
     
 	if(pFormatCtx!=0&&(strncmp(pVideoInfo->filename, "rtmp:",5)==0||strncmp(pVideoInfo->filename, "rtsp:",5)==0)){
 		pFormatCtx->probesize =1024;
-		pFormatCtx->max_analyze_duration=1;//AV_TIME_BASE;
+		pFormatCtx->max_analyze_duration=AV_TIME_BASE;
 		/*double  dx2=av_gettime ()/1000/1000-pVideoInfo->OpenTime;
         if(dx2>MaxTimeOut){
 		    err=-1;
@@ -2162,7 +2173,7 @@ void KKPlayer::ReadAV()
 //rtsp://127.0.0.1:554/stream0.sdp
 	
 	pVideoInfo->nMaxRealtimeDelay=0.5;
-	//pVideoInfo->nRealtimeDelay= 3;//Opentime2- m_nOpenTime;
+	pVideoInfo->nRealtimeDelay= 1;//Opentime2- m_nOpenTime;
 	while(m_bOpen) 
 	{
 		if(pVideoInfo->abort_request)
@@ -2241,12 +2252,12 @@ void KKPlayer::ReadAV()
 		{
 			this->ForceFlushQue();
 		}
-		while(1)
-		{
+		bool doMax=false;
+		do{
 			AVQueSize=pVideoInfo->audioq.size + pVideoInfo->videoq.size + pVideoInfo->subtitleq.size;
 			if(pVideoInfo->abort_request)
 			{
-				break;
+				
 			}else if( AVQueSize> MAX_QUEUE_SIZE){
 				// LOGE_KK("catch full");
 				 av_usleep(5000);;//等待一会
@@ -2263,11 +2274,9 @@ void KKPlayer::ReadAV()
                     }
 					countxx=0;
 				 }
-				 continue;
-			}else{
-				break;
+				doMax=true;
 			}
-		}
+		}while(doMax);
 
 
         if(pVideoInfo->nCacheTime>0&&pVideoInfo->nCacheTime>m_AVCacheInfo.MaxTime)
@@ -2295,14 +2304,9 @@ void KKPlayer::ReadAV()
 			av_packet_unref(pkt);
 			forceOver=true;
 			ret=AVERROR_EOF;
-			//pVideoInfo->eof=1;
+			
 		}
-	/*	if(pVideoInfo->pSegFormatCtx!=0&&pVideoInfo->SegStreamState==0)
-			{
-				avformat_close_input(&pVideoInfo->pSegFormatCtx);
-			}*/
-
-
+	
 		if (ret < 0) {
 			 if(pVideoInfo->bTraceAV)
 			 LOGE_KK("readAV ret=%d \n",ret);
@@ -2429,20 +2433,17 @@ void KKPlayer::ReadAV()
 		if (pkt->stream_index == pVideoInfo->audio_stream && pkt_in_play_range&&pkt->data!=NULL) {
 			packet_queue_put(&pVideoInfo->audioq, pkt,pVideoInfo->pflush_pkt,pVideoInfo->segid);
 			
-			int lx=pVideoInfo->audio_clock;
-			
+		
 			
 			m_AVCacheInfo.AudioSize=pVideoInfo->audioq.PktMemSize;
 			if(pVideoInfo->audio_st!=NULL)
 			{
 			    double pkt_ts2=pkt_ts*av_q2d(pVideoInfo->audio_st->time_base);
 				
-				if(pkt_ts2>1)
-				{
+				
 					double ss=((double)av_gettime () / 1000000)  -m_nOpenTime ;
 
-				    pVideoInfo->nRealtimeDelay=ss-pVideoInfo->audio_clock;
-				}
+				    pVideoInfo->nRealtimeDelay=pkt_ts2-pVideoInfo->audio_clock;
 				LOGE_KK("audio ms ret=%lf",pkt_ts2);
 			   LOGE_KK(", %lf \n",pVideoInfo->audio_clock);
 			}
@@ -2464,13 +2465,8 @@ void KKPlayer::ReadAV()
 				if(pVideoInfo->audio_st==NULL)
 				{
 					double pkt_ts2=pkt_ts*av_q2d(pVideoInfo->video_st->time_base);
-					
-					//if(pkt_ts2>1)
-					{
-						double ss=((double)av_gettime () / 1000000)  -m_nOpenTime ;
-
-						pVideoInfo->nRealtimeDelay=ss-pVideoInfo->video_clock;
-					}
+					//double ss=((double)av_gettime () / 1000000)  -m_nOpenTime ;
+                    pVideoInfo->nRealtimeDelay=pkt_ts2-pVideoInfo->video_clock;
 					LOGE_KK("pVideoInfo->nRealtimeDelay =%lf \n",pVideoInfo->nRealtimeDelay);
 				 
 				}

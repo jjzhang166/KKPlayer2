@@ -196,11 +196,11 @@ namespace KKMEDIA
 		return dest;
 	}
 
-	int FlvEncode::GetNALULen(char *src,int srcLen)
+	int FlvEncode::GetNALULen(const unsigned  char *src,int srcLen)
 	{
 		int len=0;
 		int Index=0;
-		char* pdata=src;
+		unsigned char* pdata=(unsigned  char *)src;
 		while(len<srcLen)
 		{
 			
@@ -227,11 +227,11 @@ namespace KKMEDIA
 		return len;
 	}
 
-	int FlvEncode::GetH264SeparatorLen(char *src,int srcLen)
+	int FlvEncode::GetH264SeparatorLen(const unsigned  char *src,int srcLen)
 	{
 		if(*src!=0x00)
 			return 0;
-		char* pdata=src;
+		unsigned char* pdata=(unsigned  char *)src;
 		
 		if(
 			*pdata==0x00&&
@@ -252,5 +252,146 @@ namespace KKMEDIA
 		}
 		return 0;
 	}
-	
+	flv_packet  FlvEncode::GetFlvHeader()
+	{
+	        KKMEDIA::FLV_HEADER flvheader=CreateFLVHeader(0x04);
+
+            KKMEDIA::METADATA MetaData;
+			memset(&MetaData,0,sizeof(MetaData));
+			MetaData.nHeight=480;
+			MetaData.nWidth=640;
+			MetaData.nFrameRate=0;
+			MetaData.nVideoDataRate=0;
+			MetaData.nVideoCodecId=7;
+
+			int OutLen;
+			void *pIfo=CreateFLVMetaData(&MetaData,OutLen);
+
+			KKMEDIA::FLV_TAG_HEADER Tag_Head;
+			memset(&Tag_Head,0,sizeof(Tag_Head));
+			Tag_Head.TagType=0x12;
+			FlvMemcpy(&Tag_Head.TagDtatLen,3,&OutLen,3);
+			//PreTagLen=
+
+			int TagDataLen=sizeof(flvheader)+OutLen+100;
+            char *pTagData =(char *)::malloc(TagDataLen);
+			memset(pTagData,0,TagDataLen);
+			memcpy(pTagData,&flvheader,sizeof(flvheader));
+
+
+			int lex=sizeof(flvheader);
+			memcpy((pTagData+lex),&Tag_Head,sizeof(Tag_Head));
+
+
+			int lex2=OutLen;
+			memcpy((pTagData+lex),pIfo,OutLen);
+
+
+			flv_packet flvpacket;
+			flvpacket.buf=(unsigned char*)pTagData;
+			flvpacket.bufLen=TagDataLen;
+			flvpacket.taglen=OutLen+11;
+			return flvpacket;
+			/**/
+		//	MetaData.nVideoFmt=
+			
+			
+			
+			
+			/*int OutLen;
+			void *pIfo=flvEc.CreateFLVMetaData(&MetaData,OutLen);
+
+			KKMEDIA::FLV_TAG_HEADER Tag_Head;
+			memset(&Tag_Head,0,sizeof(Tag_Head));
+			Tag_Head.TagType=0x12;
+			flvEc.FlvMemcpy(&Tag_Head.TagDtatLen,3,&OutLen,3);
+			fwrite(&Tag_Head,sizeof(KKMEDIA::FLV_TAG_HEADER), 1, local_recod->fp_h264_420_major);
+			fwrite(pIfo,OutLen, 1, local_recod->fp_h264_420_major);
+			PreTagLen=OutLen+11;*/
+	}
+	flv_packet FlvEncode::GetVideoPacket(const unsigned  char *buf,int bufsize,unsigned int pts,int &nPreTagLen)
+	{
+		    flv_packet flvpacket;
+		    int TagDataLen=bufsize+1000;
+            char *pTagData =(char *)::malloc(TagDataLen);
+		    unsigned char* pDataNALU=(unsigned char*)buf;
+	           
+			unsigned char NALUType=*pDataNALU&0x1f;
+			unsigned char aud=0;
+			int NaluLen=0;
+
+			char AVCPacket[5]={0x00};
+			char H264Type=0x00;
+		    char AVType=0xFF;
+			int RemainLen=bufsize;
+
+           if(NALUType==0x05){
+				H264Type=0x05;
+				AVType=0x17;//关键帧
+				AVCPacket[0]=0x01;
+			}else if(NALUType==0x41){
+					H264Type=0x41;
+					AVType=0x27;       //P帧 重要         type = 1 
+					AVCPacket[0]=0x01;
+			}else if(NALUType==0x01)
+			{
+				 H264Type=0x00;
+				 AVType=0x27; 	// B帧     不重要        type = 1 
+				 AVCPacket[0]=0x01;
+			}else if(*pDataNALU==0x06)//增强信息帧 sei
+			{
+			
+			}else {
+				//NaluLen= GetNALULen(pDataNALU,RemainLen,&RemainLen);
+			}
+			KKMEDIA::FLV_TAG_HEADER Tag_Head;
+			memset(&Tag_Head,0,sizeof(Tag_Head));
+			//前一个Tag长度
+			FlvMemcpy(&Tag_Head.PreTagLen,4,&nPreTagLen,4);
+			FlvMemcpy(&Tag_Head.Timestamp,3,&pts,3);
+			//flvEc.FlvMemcpy(&Tag_Head.streamID,3,&stream.wStreamId,3);
+
+			KKMEDIA::FLV_TAG_HEADER *ppppp=&Tag_Head;
+			Tag_Head.TagType=0x09;
+            
+			int datalen=0;
+			memcpy(pTagData+datalen,&Tag_Head,sizeof(KKMEDIA::FLV_TAG_HEADER));
+			datalen+=sizeof(KKMEDIA::FLV_TAG_HEADER);
+
+
+			//AVCPacket
+			{//视频类型
+				AVCPacket[0]=AVType;
+				AVCPacket[1]=0x01;
+				memcpy(pTagData+datalen,AVCPacket,5);
+				datalen+=5;
+			}
+			//AVC 格式 SEI 跳过
+			if (H264Type==0x06)//SEI信息
+			{
+				/*memcpy(pTagData+datalen,seiLen,4);
+				datalen+=4;
+				memcpy(pTagData+datalen,pSeiData,SEILen);
+				datalen+=datalen;*/
+			}
+
+			//NALU单元长度,大端
+			FlvMemcpy(pTagData+datalen,4,&RemainLen, 4);
+			datalen+=4;
+
+			//NALU数据
+			memcpy(pTagData+datalen,pDataNALU, RemainLen);
+			datalen+=RemainLen;
+
+			nPreTagLen=datalen-4;
+			
+			TagDataLen=datalen-15;//(11+4)
+			//Tag数据区大小
+			FlvMemcpy(pTagData+5,3,&TagDataLen,3);
+
+			flvpacket.buf=(unsigned char*)pTagData;
+			flvpacket.bufLen=datalen;
+			flvpacket.taglen=nPreTagLen;
+			return flvpacket;
+	}
 }

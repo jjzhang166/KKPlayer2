@@ -19,6 +19,7 @@ CAV_Flv::CAV_Flv(void)
 
 	m_LocalAVFirst=true;
 	m_LocalAVOk=true;
+	m_gnHear=0;
 }
 
 CAV_Flv::~CAV_Flv(void)
@@ -29,11 +30,8 @@ CAV_Flv::~CAV_Flv(void)
 void CAV_Flv::CreateFlvHeadrInfo()
 {
 
-	m_pFlvFile=fopen("c:\\test.flv", "wb");
-
+	
 	KKMEDIA::FLV_HEADER flvheader=flvEc.CreateFLVHeader(0x05);
-	fwrite(&flvheader, sizeof(flvheader), 1, m_pFlvFile);
-
 	char *pflvheader=(char*)::malloc(sizeof(flvheader));
 	memcpy(pflvheader,&flvheader,sizeof(flvheader));
 
@@ -64,16 +62,7 @@ void CAV_Flv::CreateFlvHeadrInfo()
 	Tag_Head.TagType=0x12;
 	flvEc.FlvMemcpy(&Tag_Head.TagDtatLen,3,&OutLen,3);
 
-	if(m_pFlvFile!=NULL)
-		fwrite(&Tag_Head,sizeof(KKMEDIA::FLV_TAG_HEADER), 1, m_pFlvFile);
-
 	m_ReCalPreTagLen=sizeof(KKMEDIA::FLV_TAG_HEADER)-4;
-
-	if(m_pFlvFile!=NULL)
-	{
-		MetaDataPos=ftell(m_pFlvFile);
-		fwrite(pMetaDatafo,OutLen, 1, m_pFlvFile);
-	}
 
 	int llxx=sizeof(KKMEDIA::FLV_TAG_HEADER)+OutLen;
 	char *pData =(char*)::malloc(llxx);
@@ -101,8 +90,11 @@ void CAV_Flv::CreateFlvHeadrInfo()
 	//获取视频流封装成flv格式
 	int CAV_Flv::LocalRecord(bool IsVideo,unsigned char* avbuffer,unsigned int avbufferlen,int avpts)
 	{
-		if(m_pFlvFile==NULL)
+		if(m_gnHear==0)
+		{
 			CreateFlvHeadrInfo();
+			m_gnHear=1;
+		}
 	
 		{
 			
@@ -648,18 +640,5 @@ LOOP1:
 				}
 			}
 		}
-
-
-		/*std::vector<S_Data_Info*>::iterator It=m_Data_Vect.begin();
-		for(;It!=m_Data_Vect.end();)
-		{
-			S_Data_Info* pInfo=*It;
-			free(pInfo->pData);
-			free(pInfo);
-			It=m_Data_Vect.erase(It);
-		}*/
-	
-	
-	//	::free(recv_data);
 		return 0;
 	}

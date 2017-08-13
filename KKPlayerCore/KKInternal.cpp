@@ -638,8 +638,10 @@ void audio_callback(void *userdata, char *stream, int len)
 	pVideoInfo->audio_write_buf_size = pVideoInfo->audio_buf_size - pVideoInfo->audio_buf_index;
 	if (!isNAN(pVideoInfo->audio_clock)) 
 	{
-		double sle=(double)(2 * silencelen)/ pVideoInfo->audio_tgt.bytes_per_sec;
-		//pVideoInfo->nRealtimeDelay+=sle;
+		if(silencelen>0){
+		   double sle=(double)(2 * silencelen)/ pVideoInfo->audio_tgt.bytes_per_sec;
+		pVideoInfo->nRealtimeDelay+=sle;
+		}
 		set_clock_at(&pVideoInfo->audclk,     
 			pVideoInfo->audio_clock - (double)(2 * pVideoInfo->audio_hw_buf_size + pVideoInfo->audio_write_buf_size) / pVideoInfo->audio_tgt.bytes_per_sec, 
 			pVideoInfo->audio_clock_serial, 
