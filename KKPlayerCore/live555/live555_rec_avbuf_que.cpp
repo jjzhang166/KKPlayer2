@@ -111,7 +111,7 @@ void  live555_rec_avbuf_que::avbufpush(unsigned int pts,bool video,const char* b
 								char *pTagData =(char *)::malloc(TagDataLen);	
 	                            char AVCPacket[5]={0x00};
 								char H264Type=0x00;
-								char AVType=0xFF;
+								char AVType=0x17;
 								int RemainLen=bufsize;
                                 int NaluLen=0;
 							    KKMEDIA::AVC_DEC_CON_REC avc_dec_con_rec;
@@ -232,6 +232,7 @@ void  live555_rec_avbuf_que::avbufpush(unsigned int pts,bool video,const char* b
 								m_Lock.Unlock();
                                
 							
+								///¿½±´Ê£ÓàµÄÖ¡
 								if(RemainLen>0)
 								{
 									NaluLen= m_flvEc.GetH264SeparatorLen(temp,4);

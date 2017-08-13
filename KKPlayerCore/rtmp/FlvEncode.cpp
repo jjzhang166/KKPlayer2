@@ -265,6 +265,7 @@ namespace KKMEDIA
 			MetaData.nVideoCodecId=7;
 
 			int OutLen;
+			int datalen=0;
 			void *pIfo=CreateFLVMetaData(&MetaData,OutLen);
 
 			KKMEDIA::FLV_TAG_HEADER Tag_Head;
@@ -273,23 +274,26 @@ namespace KKMEDIA
 			FlvMemcpy(&Tag_Head.TagDtatLen,3,&OutLen,3);
 			//PreTagLen=
 
+			
 			int TagDataLen=sizeof(flvheader)+OutLen+100;
             char *pTagData =(char *)::malloc(TagDataLen);
 			memset(pTagData,0,TagDataLen);
+			///拷贝flv头
 			memcpy(pTagData,&flvheader,sizeof(flvheader));
 
 
+			//tag头
 			int lex=sizeof(flvheader);
 			memcpy((pTagData+lex),&Tag_Head,sizeof(Tag_Head));
 
-
-			int lex2=OutLen;
-			memcpy((pTagData+lex),pIfo,OutLen);
+            ///tag数据
+			int len2=sizeof(Tag_Head);
+			memcpy((pTagData+lex+len2),pIfo,OutLen);
 
 
 			flv_packet flvpacket;
 			flvpacket.buf=(unsigned char*)pTagData;
-			flvpacket.bufLen=TagDataLen;
+			flvpacket.bufLen=lex+len2+OutLen;
 			flvpacket.taglen=OutLen+11;
 			return flvpacket;
 			/**/

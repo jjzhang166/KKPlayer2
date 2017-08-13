@@ -8,9 +8,11 @@ DummySink* DummySink::createNew(UsageEnvironment& env, MediaSubsession& subsessi
 }
 
 DummySink::DummySink(UsageEnvironment& env, MediaSubsession& subsession,live555_rec_avbuf_que* avbuf_que, char const* streamId)
-  : MediaSink(env),
-  m_pavbuf_que(avbuf_que),
-    fSubsession(subsession) {
+  : MediaSink(env)
+  ,m_pavbuf_que(avbuf_que)
+  ,fSubsession(subsession)
+  ,m_nStartPts(0)
+{
   fStreamId = strDup(streamId);
   fReceiveBuffer = new u_int8_t[DUMMY_SINK_RECEIVE_BUFFER_SIZE];
 }
@@ -36,7 +38,13 @@ void DummySink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes
 	if(m_pavbuf_que!=NULL){
 		
 		std::string mediumName=fSubsession.mediumName();
-		unsigned int pts=presentationTime.tv_sec*1000+presentationTime.tv_usec/1000;
+		
+		if(m_nStartPts==0)
+		{
+		   m_nStartPts=presentationTime.tv_sec*1000+presentationTime.tv_usec/1000;
+		}
+		
+		unsigned int pts=presentationTime.tv_sec*1000+presentationTime.tv_usec/1000-m_nStartPts;
 		bool isvideo=false;
 		if(mediumName!="audio")
 		{

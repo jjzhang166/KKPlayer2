@@ -1982,6 +1982,10 @@ void KKPlayer::ReadAV()
 		 av_dict_set(&format_opts, "max_delay","0",0);
 		  av_dict_set(&format_opts, "analyzeduration","1000000",0);
 	}
+
+	 av_dict_set(&format_opts, "fflags","nobuffer", 0);
+		 av_dict_set(&format_opts, "max_delay","0",0);
+		  av_dict_set(&format_opts, "analyzeduration","1000000",0);
 	///ÃüÁîÐÐÑ¡Ïî
 	if(m_strcmd.length()>1)
 	{
