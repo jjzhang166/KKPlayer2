@@ -2176,8 +2176,8 @@ void KKPlayer::ReadAV()
 	
 //rtsp://127.0.0.1:554/stream0.sdp
 	
-	pVideoInfo->nMaxRealtimeDelay=0.5;
-	pVideoInfo->nRealtimeDelay= 1;//Opentime2- m_nOpenTime;
+	//pVideoInfo->nMaxRealtimeDelay= 0.5;
+	//pVideoInfo->nRealtimeDelay   = 1;//Opentime2- m_nOpenTime;
 	while(m_bOpen) 
 	{
 		if(pVideoInfo->abort_request)

@@ -76,15 +76,18 @@ live555_av_buf_*  live555_rec_avbuf_que::avbufpop()
 FILE* m_pFlvFile=0;
 void  live555_rec_avbuf_que::avbufpush(unsigned int pts,bool video,const char* buf,int bufsize)
 {
-	live555_av_buf_* item=(live555_av_buf_*)::malloc(sizeof(live555_av_buf_));
+	
 	
 		
 
 
 	if(video){
+		live555_av_buf_* item=(live555_av_buf_*)::malloc(sizeof(live555_av_buf_));
 		       
 				        unsigned char* pDataNALU=(unsigned char*)buf;
 	           
+						int SeparatorLen=m_flvEc.GetH264SeparatorLen(pDataNALU,4);
+                        pDataNALU+=SeparatorLen;
 						unsigned char NALUType=*pDataNALU&0x1f;
 						unsigned char aud=0;
 						
