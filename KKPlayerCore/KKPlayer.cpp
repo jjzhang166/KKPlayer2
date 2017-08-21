@@ -1846,7 +1846,7 @@ void KKPlayer::AvDelayParser()
 	}*/
 
 	
-	//LOGE_KK("de %.3fs,que audioq:%d,videoq:%d,subtitleq:%d \n",pVideoInfo->nRealtimeDelay,pVideoInfo->audioq.size,pVideoInfo->videoq.size,pVideoInfo->subtitleq.size);
+	LOGE_KK("de %.3fs,que audioq:%d,videoq:%d,subtitleq:%d \n",pVideoInfo->nRealtimeDelay,pVideoInfo->audioq.size,pVideoInfo->videoq.size,pVideoInfo->subtitleq.size);
 	///有音频有视频
 	if(pVideoInfo->NeedWait&&pVideoInfo->audio_st!=NULL){
 			if(pVideoInfo->audioq.size==0||pVideoInfo->videoq.size==0){
@@ -1985,6 +1985,7 @@ void KKPlayer::ReadAV()
 	     av_dict_set(&format_opts, "fflags","nobuffer", 0);
 		 av_dict_set(&format_opts, "max_delay","0",0);
 		 av_dict_set(&format_opts, "analyzeduration","1000",0);
+		 pVideoInfo->nMaxRealtimeDelay= 0.5;
 	}
 	///命令行选项
 	if(m_strcmd.length()>1)
@@ -2176,7 +2177,7 @@ void KKPlayer::ReadAV()
 	
 //rtsp://127.0.0.1:554/stream0.sdp
 	
-	//pVideoInfo->nMaxRealtimeDelay= 0.5;
+	
 	//pVideoInfo->nRealtimeDelay   = 1;//Opentime2- m_nOpenTime;
 	while(m_bOpen) 
 	{
@@ -2444,17 +2445,18 @@ void KKPlayer::ReadAV()
 			{
 			    double pkt_ts2=pkt_ts*av_q2d(pVideoInfo->audio_st->time_base);
 				
-				
+				/*
 					double ss=((double)av_gettime () / 1000000)  -m_nOpenTime ;
 
 				    pVideoInfo->nRealtimeDelay=pkt_ts2-pVideoInfo->audio_clock;
 				LOGE_KK("audio ms ret=%lf",pkt_ts2);
-			   LOGE_KK(", %lf \n",pVideoInfo->audio_clock);
-			}
-			if(m_AVCacheInfo.MaxTime<pkt_ts)
-			{
-				m_AVCacheInfo.MaxTime=pkt_ts;
-			}
+			   LOGE_KK(", %lf \n",pVideoInfo->audio_clock);*/
+				if(m_AVCacheInfo.MaxTime<pkt_ts)
+				{
+					m_AVCacheInfo.MaxTime=pkt_ts;
+				}
+			}/**/
+			
 			m_nhasVideoAudio|=0x0001;
 		} else if (//视频
 			pkt->stream_index == pVideoInfo->video_stream && pkt_in_play_range
@@ -2466,20 +2468,21 @@ void KKPlayer::ReadAV()
 			if(pVideoInfo->video_st!=NULL){
 				pkt_ts=pkt_ts*av_q2d(pVideoInfo->video_st->time_base);
 
-				if(pVideoInfo->audio_st==NULL)
+				//if(pVideoInfo->audio_st==NULL)
+				//{
+				//	double pkt_ts2=pkt_ts*av_q2d(pVideoInfo->video_st->time_base);
+				//	//double ss=((double)av_gettime () / 1000000)  -m_nOpenTime ;
+    //                pVideoInfo->nRealtimeDelay=pkt_ts2-pVideoInfo->video_clock;
+				//	LOGE_KK("pVideoInfo->nRealtimeDelay =%lf \n",pVideoInfo->nRealtimeDelay);
+				// 
+				//}
+				if(m_AVCacheInfo.MaxTime<pkt_ts)
 				{
-					double pkt_ts2=pkt_ts*av_q2d(pVideoInfo->video_st->time_base);
-					//double ss=((double)av_gettime () / 1000000)  -m_nOpenTime ;
-                    pVideoInfo->nRealtimeDelay=pkt_ts2-pVideoInfo->video_clock;
-					LOGE_KK("pVideoInfo->nRealtimeDelay =%lf \n",pVideoInfo->nRealtimeDelay);
-				 
+					 m_AVCacheInfo.MaxTime=pkt_ts;
 				}
 
 			}
-			if(m_AVCacheInfo.MaxTime<pkt_ts)
-			{
-                 m_AVCacheInfo.MaxTime=pkt_ts;
-			}
+			
 			m_nhasVideoAudio|=0x0010;
 		}//字幕
 		else if (pkt->stream_index == pVideoInfo->subtitle_stream && pkt_in_play_range&&pkt->data!=NULL) 
