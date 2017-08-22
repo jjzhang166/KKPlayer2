@@ -201,8 +201,36 @@ namespace SOUI
 		SWindow *pBtn=(SWindow *)pEvt->sender;
         int Id=pBtn->GetUserData();
 		if(Id<DataItemVector.size()){
-			DataItem &Item=DataItemVector.at(Id);
+			 DataItem &Item=DataItemVector.at(Id);
+			 
+			
+			 SStringT tiptxt=pBtn->GetToolTipText();
+			 bool pause=1;
+			 if(tiptxt==L"暂停下载")
+			 {
+			      pBtn->SetAttribute(L"skin",L"_skin.1PLAY");
+                  pBtn->SetToolTipText(L"开始下载");
+				  pause=true;
+			 }else{
+			     pBtn->SetAttribute(L"skin",L"_skin.1PAUSE");
+				 pBtn->SetToolTipText(L"暂停下载");
+				 pause=false;
+			 }
 
+			   std::list<KKPluginInfo>  &PlList=KKPlayer::GetKKPluginInfoList();
+		       std::list<KKPluginInfo>::iterator It=PlList.begin();
+		       for(;It!=PlList.end();++It){
+				   
+                  if( !strncmp(Item.ptl,It->ptl,strlen(Item.ptl)))
+				  {
+					  if(It->KKDelDownAVFile)
+					  {
+						  It->KKPauseDownAVFile(Item.srcUrl.c_str(),pause);
+					    //  It->KKDelDownAVFile(Item.srcUrl.c_str(),0);
+					  }
+					  return true;
+				  }
+		       }
 		}
 	    return true;
 	}
@@ -272,7 +300,8 @@ namespace SOUI
 			 } 
              pWin= pItem->FindChildByName(L"btn_pause");
 			 if(pWin){
-				
+				 pWin->SetUserData(position);
+				 pWin->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CDownAVListMcAdapterFix::OnItemPause,this));
 			 }
 
              pWin= pItem->FindChildByName(L"btn_delete");

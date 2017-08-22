@@ -16,7 +16,6 @@
 #include <vector>
 
 #include "vp8_partition_aggregator.h"
-#include "../system_wrappers/interface/logging.h"
 
 namespace webrtc {
 namespace {
@@ -699,7 +698,7 @@ bool RtpDepacketizerVp8::Parse(ParsedPayload* parsed_payload,
   // Advance payload_data and decrease remaining payload size.
   payload_data++;
   if (payload_data_length <= 1) {
-    LOG(LS_ERROR) << "Error parsing VP8 payload descriptor!";
+   
     return false;
   }
   payload_data_length--;
@@ -714,7 +713,7 @@ bool RtpDepacketizerVp8::Parse(ParsedPayload* parsed_payload,
     payload_data += parsed_bytes;
     payload_data_length -= parsed_bytes;
     if (payload_data_length == 0) {
-      LOG(LS_ERROR) << "Error parsing VP8 payload descriptor!";
+    
       return false;
     }
   }

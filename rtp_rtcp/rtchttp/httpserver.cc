@@ -15,7 +15,7 @@
 #include "../socket/asyncsocket.h"
 #include "../base/common.h"
 #include "httpserver.h"
-#include "../base/logging.h"
+
 #include "../socket/socketstream.h"
 #include "../base/thread.h"
 
@@ -30,7 +30,7 @@ HttpServer::HttpServer() : next_connection_id_(1), closing_(false) {
 
 HttpServer::~HttpServer() {
   if (closing_) {
-    LOG(LS_WARNING) << "HttpServer::CloseAll has not completed";
+    //"HttpServer::CloseAll has not completed";
   }
   for (ConnectionMap::iterator it = connections_.begin();
        it != connections_.end();

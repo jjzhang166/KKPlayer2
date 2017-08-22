@@ -34,6 +34,6 @@ public:
 		virtual  void       CloseMedia()=0;
         virtual  void       SetVlcVolume(int volume,bool tip=true)=0;
 		virtual  void       SetUserData(void* UserData)=0;
-		virtual  void       SetMaxRealtimeDelay(int Delay)=0;
+		virtual  void       SetMaxRealtimeDelay(double Delay)=0;
 };
 #endif

@@ -5,7 +5,7 @@ NDK_PATH=D:/ProgramFiles/Android/Androidsdk/ndk-bundle
 #NDK_PATH=E:/android/android-sdk-windows/ndk-bundle
 #此处需要修改
 #FFMPEGLib=D:/work/Projects/KKPlayer/libarm/ffmpeg/lib/
-FFMPEGLib=../libarm/ffmpeg/lib/
+FFMPEGLib=../ffmpeg/arm/armv7
 #此处需要修改
 #FFMPEGINCLUDE=D:/work/Projects/KKPlayer/ffmpeg/include
 FFMPEGINCLUDE=../ffmpeg/include

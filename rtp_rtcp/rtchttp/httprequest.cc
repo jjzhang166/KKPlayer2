@@ -13,7 +13,7 @@
 #include "../base/common.h"
 #include "../socket/firewallsocketserver.h"
 #include "httpclient.h"
-#include "../base/logging.h"
+
 #include "../socket/physicalsocketserver.h"
 #include "../socket/socketadapters.h"
 #include "../socket/socketpool.h"

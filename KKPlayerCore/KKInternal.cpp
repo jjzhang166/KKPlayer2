@@ -309,7 +309,24 @@ double get_master_clock(SKK_VideoState *is)
 	}
 	return val;
 }
-
+#define EXTERNAL_CLOCK_MIN_FRAMES 2
+#define EXTERNAL_CLOCK_MAX_FRAMES 10
+#define EXTERNAL_CLOCK_SPEED_MIN  0.900
+#define EXTERNAL_CLOCK_SPEED_MAX  1.010
+#define EXTERNAL_CLOCK_SPEED_STEP 0.001
+ void check_external_clock_speed(SKK_VideoState *is) {
+   if (is->video_stream >= 0 && is->videoq.nb_packets <= EXTERNAL_CLOCK_MIN_FRAMES ||
+       is->audio_stream >= 0 && is->audioq.nb_packets <= EXTERNAL_CLOCK_MIN_FRAMES) {
+       set_clock_speed(&is->extclk, FFMAX(EXTERNAL_CLOCK_SPEED_MIN, is->extclk.speed - EXTERNAL_CLOCK_SPEED_STEP));
+   } else if ((is->video_stream < 0 || is->videoq.nb_packets > EXTERNAL_CLOCK_MAX_FRAMES) &&
+              (is->audio_stream < 0 || is->audioq.nb_packets > EXTERNAL_CLOCK_MAX_FRAMES)) {
+       set_clock_speed(&is->extclk, FFMIN(EXTERNAL_CLOCK_SPEED_MAX, is->extclk.speed + EXTERNAL_CLOCK_SPEED_STEP));
+   } else {
+       double speed = is->extclk.speed;
+       if (speed != 1.0)
+           set_clock_speed(&is->extclk, speed + EXTERNAL_CLOCK_SPEED_STEP * (1.0 - speed) / fabs(1.0 - speed));
+   }
+}
 static int synchronize_audio(SKK_VideoState *is, int nb_samples)
 {
     int wanted_nb_samples = nb_samples;
@@ -378,7 +395,7 @@ int frame_queue_init(SKK_FrameQueue *f, SKK_PacketQueue *pktq, int max_size, int
 int audio_fill_frame( SKK_VideoState *pVideoInfo) 
 { 
 
-	
+	bool Afterdelay=false;
 DELXXX:
 	int n=0;
 	AVCodecContext *aCodecCtx=pVideoInfo->auddec.avctx;	
@@ -400,7 +417,6 @@ DELXXX:
 	   while (frame_queue_nb_remaining(&is->sampq) <= 0) {
 		   if ((av_gettime_relative() - is->audio_callback_time) > 1000000LL * is->audio_hw_buf_size / is->audio_tgt.bytes_per_sec / 2)
 			   return -1;
-		   av_usleep (5000);
 	   }
 #else
 	    if(frame_queue_nb_remaining(&is->sampq) <= 0) 
@@ -530,10 +546,16 @@ DELXXX:
 		 if(data_size>0&&!is->abort_request&&is->realtime&&!is->abort_request)
 		 {
 			
-			 if(pVideoInfo->nRealtimeDelay>is->nMaxRealtimeDelay)
+			 if(pVideoInfo->nRealtimeDelay>is->nMaxRealtimeDelay||Afterdelay)
 			 { 
 				 pVideoInfo->nRealtimeDelay-=ll;
 				 is->nRealtimeDelayCount++;
+				 Afterdelay=true;
+				 if(pVideoInfo->nRealtimeDelay<=0.0000001)
+				 {
+				     pVideoInfo->nRealtimeDelay=0.0000001;
+					  Afterdelay=false;
+				 }
 				 goto DELXXX;
 			 }else{
 				 is->nRealtimeDelayCount=0;
@@ -581,6 +603,7 @@ void audio_callback(void *userdata, char *stream, int len)
 	int slen=len;
 	//获取现在的时间
 	pVideoInfo->audio_callback_time = av_gettime_relative();
+	int silencelen=0;
 	while (len > 0) 
 	{
 		if (pVideoInfo->audio_buf_index >= pVideoInfo->audio_buf_size) 
@@ -590,6 +613,7 @@ void audio_callback(void *userdata, char *stream, int len)
 			{
 				pVideoInfo->audio_buf = pVideoInfo->silence_buf;
                 pVideoInfo->audio_buf_size =512 / pVideoInfo->audio_tgt.frame_size * pVideoInfo->audio_tgt.frame_size;
+				silencelen+=512;
 			  
 			} else 
 			{		
@@ -614,6 +638,10 @@ void audio_callback(void *userdata, char *stream, int len)
 	pVideoInfo->audio_write_buf_size = pVideoInfo->audio_buf_size - pVideoInfo->audio_buf_index;
 	if (!isNAN(pVideoInfo->audio_clock)) 
 	{
+		if(silencelen>0){
+		   double sle=(double)(2 * silencelen)/ pVideoInfo->audio_tgt.bytes_per_sec;
+		pVideoInfo->nRealtimeDelay+=sle;
+		}
 		set_clock_at(&pVideoInfo->audclk,     
 			pVideoInfo->audio_clock - (double)(2 * pVideoInfo->audio_hw_buf_size + pVideoInfo->audio_write_buf_size) / pVideoInfo->audio_tgt.bytes_per_sec, 
 			pVideoInfo->audio_clock_serial, 

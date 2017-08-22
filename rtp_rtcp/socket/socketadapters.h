@@ -16,7 +16,7 @@
 
 #include "../socket/asyncsocket.h"
 #include "../base/cryptstring.h"
-#include "../base/logging.h"
+
 
 namespace rtc {
 

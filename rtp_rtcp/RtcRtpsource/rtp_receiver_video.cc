@@ -18,7 +18,6 @@
 #include "rtp_format_video_generic.h"
 #include "rtp_utility.h"
 #include "../system_wrappers/interface/critical_section_wrapper.h"
-#include "../system_wrappers/interface/logging.h"
 #include "../system_wrappers/interface/trace_event.h"
 
 namespace webrtc {
@@ -74,7 +73,7 @@ int32_t RTPReceiverVideo::ParseRtpPacket(WebRtcRTPHeader* rtp_header,
   scoped_ptr<RtpDepacketizer> depacketizer(
       RtpDepacketizer::Create(rtp_header->type.Video.codec));
   if (depacketizer.get() == NULL) {
-    LOG(LS_ERROR) << "Failed to create depacketizer.";
+    //"Failed to create depacketizer.";
     return -1;
   }
 
@@ -111,8 +110,8 @@ int32_t RTPReceiverVideo::InvokeOnInitializeDecoder(
   if (-1 ==
       callback->OnInitializeDecoder(
           id, payload_type, payload_name, kVideoPayloadTypeFrequency, 1, 0)) {
-    LOG(LS_ERROR) << "Failed to created decoder for payload type: "
-                  << payload_type;
+   // "Failed to created decoder for payload type: "
+       //           << payload_type;
     return -1;
   }
   return 0;

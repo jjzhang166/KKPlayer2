@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "../base/common.h"
-#include "../base/logging.h"
+
 #include "schanneladapter.h"
 #include "../base/sec_buffer.h"
 #include "../base/thread.h"

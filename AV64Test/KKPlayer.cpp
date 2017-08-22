@@ -87,7 +87,7 @@ void CKKPlayer::DuiSize(int w,int h)
 	      m_FpKKDuiOnSize(m_pPlayerh,w,h);
 	 }
 }
-void   CKKPlayer::SetMaxRealtimeDelay(int Delay)
+void   CKKPlayer::SetMaxRealtimeDelay(double Delay)
 {
     if(m_FpSetMaxRealtimeDelay&&m_pPlayerh)
 	{

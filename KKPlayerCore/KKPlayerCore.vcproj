@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\INTInclude;..\ffmpeg\include;..\librtmp;..\libmfx\include;..\libmfx\include\mfx"
+				AdditionalIncludeDirectories="..\INTInclude;..\ffmpeg\include;..\librtmp;..\libmfx\include;..\libmfx\include\mfx;../live555/liveMedia/includegroupsock/include;../live555/UsageEnvironment/include;../live555/BasicUsageEnvironment/include;../live555/groupsock/include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -173,7 +173,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\libmfx\include;..\libmfx\include\mfx;..\INTInclude;..\ffmpeg\include;..\librtmp"
+				AdditionalIncludeDirectories="..\libmfx\include;..\libmfx\include\mfx;..\INTInclude;..\ffmpeg\include;..\librtmp;../live555/liveMedia/includegroupsock/include;../live555/UsageEnvironment/include;../live555/BasicUsageEnvironment/include;../live555/groupsock/include"
 				PreprocessorDefinitions="WIN32;KK_WIN32;_WINDOWS;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -504,6 +504,58 @@
 			>
 			<File
 				RelativePath=".\render\render.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="live555"
+			>
+			<File
+				RelativePath=".\live555\DummySink.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\DummySink.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555_rec_avbuf_que.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555_rec_avbuf_que.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555_rtsp_io.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555rtsp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\live555rtsp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\ourRTSPClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\ourRTSPClient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\StreamClientState.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\live555\StreamClientState.h"
 				>
 			</File>
 		</Filter>

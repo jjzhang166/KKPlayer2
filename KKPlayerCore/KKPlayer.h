@@ -18,7 +18,7 @@
 #include "KKLock.h"
 #include "KKVideoInfo.h"
 #include "KKPlugin.h"
-
+#include <string>
 #ifndef KKPlayer_H_
 #define KKPlayer_H_
 
@@ -214,7 +214,7 @@ private:
 			int                             m_AudioPicBufLen;
 			//解码后图形的格式
 			AVPixelFormat                   m_DstAVff;
-			
+			double                             m_nOpenTime;
 #ifdef Android_Plat
 			void *  m_pVideoRefreshJNIEnv;
 			void*   m_pSurfaceTexture;

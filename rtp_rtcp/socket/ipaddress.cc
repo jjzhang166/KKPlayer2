@@ -28,7 +28,6 @@
 #include "ipaddress.h"
 #include "../base/byteorder.h"
 #include "nethelpers.h"
-#include "../base/logging.h"
 #include "../base/win32.h"
 
 namespace rtc {

@@ -13,7 +13,6 @@
 
 #include <deque>
 #include <list>
-#include "../base/logging.h"
 #include "../base/sigslot.h"
 #include "socketaddress.h"
 
@@ -116,27 +115,6 @@ private:
 // LoggingAdapters.
 ///////////////////////////////////////////////////////////////////////////////
 
-class LoggingPoolAdapter : public StreamPool {
-public:
-  LoggingPoolAdapter(StreamPool* pool, LoggingSeverity level,
-                     const std::string& label, bool binary_mode);
-  virtual ~LoggingPoolAdapter();
-
-  // StreamPool Interface
-  virtual StreamInterface* RequestConnectedStream(const SocketAddress& remote,
-                                                  int* err);
-  virtual void ReturnConnectedStream(StreamInterface* stream);
-
-private:
-  StreamPool* pool_;
-  LoggingSeverity level_;
-  std::string label_;
-  bool binary_mode_;
-  typedef std::deque<LoggingAdapter*> StreamList;
-  StreamList recycle_bin_;
-};
-
-//////////////////////////////////////////////////////////////////////
 
 }  // namespace rtc
 

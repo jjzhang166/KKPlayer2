@@ -11,7 +11,6 @@
 #include <iomanip>
 
 #include "asyncsocket.h"
-#include "../base/logging.h"
 #include "socketfactory.h"
 #include "socketpool.h"
 #include "socketstream.h"
@@ -40,7 +39,7 @@ StreamCache::~StreamCache() {
 
 StreamInterface* StreamCache::RequestConnectedStream(
     const SocketAddress& remote, int* err) {
-  LOG_F(LS_VERBOSE) << "(" << remote << ")";
+
   for (ConnectedList::iterator it = cached_.begin(); it != cached_.end();
        ++it) {
     if (remote == it->first) {
@@ -50,14 +49,14 @@ StreamInterface* StreamCache::RequestConnectedStream(
       cached_.erase(it);
       if (err)
         *err = 0;
-      LOG_F(LS_VERBOSE) << "Providing cached stream";
+     //"Providing cached stream";
       return active_.front().second;
     }
   }
   if (StreamInterface* stream = pool_->RequestConnectedStream(remote, err)) {
     // We track active streams so that we can remember their address
     active_.push_front(ConnectedStream(remote, stream));
-    LOG_F(LS_VERBOSE) << "Providing new stream";
+    // "Providing new stream";
     return active_.front().second;
   }
   return NULL;
@@ -67,15 +66,15 @@ void StreamCache::ReturnConnectedStream(StreamInterface* stream) {
   for (ConnectedList::iterator it = active_.begin(); it != active_.end();
        ++it) {
     if (stream == it->second) {
-      LOG_F(LS_VERBOSE) << "(" << it->first << ")";
+      // "(" << it->first << ")";
       if (stream->GetState() == SS_CLOSED) {
         // Return closed streams
-        LOG_F(LS_VERBOSE) << "Returning closed stream";
+        // "Returning closed stream";
         pool_->ReturnConnectedStream(it->second);
       } else {
         // Monitor open streams
         stream->SignalEvent.connect(this, &StreamCache::OnStreamEvent);
-        LOG_F(LS_VERBOSE) << "Caching stream";
+        //"Caching stream";
         cached_.push_front(*it);
       }
       active_.erase(it);
@@ -87,17 +86,17 @@ void StreamCache::ReturnConnectedStream(StreamInterface* stream) {
 
 void StreamCache::OnStreamEvent(StreamInterface* stream, int events, int err) {
   if ((events & SE_CLOSE) == 0) {
-    LOG_F(LS_WARNING) << "(" << events << ", " << err
-                      << ") received non-close event";
+    //"(" << events << ", " << err
+     // ") received non-close event";
     return;
   }
   for (ConnectedList::iterator it = cached_.begin(); it != cached_.end();
        ++it) {
     if (stream == it->second) {
-      LOG_F(LS_VERBOSE) << "(" << it->first << ")";
+     // "(" << it->first << ")";
       // We don't cache closed streams, so return it.
       it->second->SignalEvent.disconnect(this);
-      LOG_F(LS_VERBOSE) << "Returning closed stream";
+      //"Returning closed stream";
       pool_->ReturnConnectedStream(it->second);
       cached_.erase(it);
       return;
@@ -159,7 +158,7 @@ ReuseSocketPool::RequestConnectedStream(const SocketAddress& remote, int* err) {
   // Only one socket can be used from this "pool" at a time
   ASSERT(!checked_out_);
   if (!stream_) {
-    LOG_F(LS_VERBOSE) << "Creating new socket";
+    // "Creating new socket";
     int family = remote.family();
     // TODO: Deal with this when we/I clean up DNS resolution.
     if (remote.IsUnresolvedIP()) {
@@ -175,7 +174,7 @@ ReuseSocketPool::RequestConnectedStream(const SocketAddress& remote, int* err) {
     stream_ = new SocketStream(socket);
   }
   if ((stream_->GetState() == SS_OPEN) && (remote == remote_)) {
-    LOG_F(LS_VERBOSE) << "Reusing connection to: " << remote_;
+    // "Reusing connection to: " << remote_;
   } else {
     remote_ = remote;
     stream_->Close();
@@ -185,7 +184,7 @@ ReuseSocketPool::RequestConnectedStream(const SocketAddress& remote, int* err) {
         *err = stream_->GetSocket()->GetError();
       return NULL;
     } else {
-      LOG_F(LS_VERBOSE) << "Opening connection to: " << remote_;
+     // "Opening connection to: " << remote_;
     }
   }
   stream_->SignalEvent.disconnect(this);
@@ -212,7 +211,7 @@ ReuseSocketPool::OnStreamEvent(StreamInterface* stream, int events, int err) {
   // If the stream was written to and then immediately returned to us then
   // we may get a writable notification for it, which we should ignore.
   if (events == SE_WRITE) {
-    LOG_F(LS_VERBOSE) << "Pooled Socket unexpectedly writable: ignoring";
+    // "Pooled Socket unexpectedly writable: ignoring";
     return;
   }
 
@@ -221,9 +220,9 @@ ReuseSocketPool::OnStreamEvent(StreamInterface* stream, int events, int err) {
   // In either case, we'll reconnect it the next time it is used.
   ASSERT(0 != (events & (SE_READ|SE_CLOSE)));
   if (0 != (events & SE_CLOSE)) {
-    LOG_F(LS_VERBOSE) << "Connection closed with error: " << err;
+    // "Connection closed with error: " << err;
   } else {
-    LOG_F(LS_VERBOSE) << "Pooled Socket unexpectedly readable: closing";
+    // "Pooled Socket unexpectedly readable: closing";
   }
   stream_->Close();
 }
@@ -233,48 +232,5 @@ ReuseSocketPool::OnStreamEvent(StreamInterface* stream, int events, int err) {
 // LoggingAdapters.
 ///////////////////////////////////////////////////////////////////////////////
 
-LoggingPoolAdapter::LoggingPoolAdapter(
-    StreamPool* pool, LoggingSeverity level, const std::string& label,
-    bool binary_mode)
-  : pool_(pool), level_(level), label_(label), binary_mode_(binary_mode) {
-}
-
-LoggingPoolAdapter::~LoggingPoolAdapter() {
-  for (StreamList::iterator it = recycle_bin_.begin();
-       it != recycle_bin_.end(); ++it) {
-    delete *it;
-  }
-}
-
-StreamInterface* LoggingPoolAdapter::RequestConnectedStream(
-    const SocketAddress& remote, int* err) {
-  if (StreamInterface* stream = pool_->RequestConnectedStream(remote, err)) {
-    ASSERT(SS_CLOSED != stream->GetState());
-    std::stringstream ss;
-    ss << label_ << "(0x" << std::setfill('0') << std::hex << std::setw(8)
-       << stream << ")";
-    LOG_V(level_) << ss.str()
-                  << ((SS_OPEN == stream->GetState()) ? " Connected"
-                                                      : " Connecting")
-                  << " to " << remote;
-    if (recycle_bin_.empty()) {
-      return new LoggingAdapter(stream, level_, ss.str(), binary_mode_);
-    }
-    LoggingAdapter* logging = recycle_bin_.front();
-    recycle_bin_.pop_front();
-    logging->set_label(ss.str());
-    logging->Attach(stream);
-    return logging;
-  }
-  return NULL;
-}
-
-void LoggingPoolAdapter::ReturnConnectedStream(StreamInterface* stream) {
-  LoggingAdapter* logging = static_cast<LoggingAdapter*>(stream);
-  pool_->ReturnConnectedStream(logging->Detach());
-  recycle_bin_.push_back(logging);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 
 } // namespace rtc

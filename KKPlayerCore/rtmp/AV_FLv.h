@@ -15,7 +15,7 @@
 				CAV_Flv(void);
 				~CAV_Flv(void);
 				void CreateFlvHeadrInfo();
-				int LocalRecord(bool IsVideo,unsigned char* avbuffer,unsigned int avbufferlen,int avpts);
+				int  LocalRecord(bool IsVideo,unsigned char* avbuffer,unsigned int avbufferlen,int avpts);
 			private:
 				/******准备好的数据*****/
 				std::queue<S_Data_Info*> m_VideoData_Queue;
@@ -42,5 +42,7 @@
 				S_Data_Info* pVideoInfo;
 				S_Data_Info* pAudioInfo;
 				bool SPSFist;
+
+				int m_gnHear;
 	};
 #endif

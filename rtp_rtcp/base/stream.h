@@ -16,7 +16,6 @@
 #include "basictypes.h"
 #include "buffer.h"
 #include "criticalsection.h"
-#include "logging.h"
 #include "messagehandler.h"
 #include "messagequeue.h"
 #include "scoped_ptr.h"
@@ -686,30 +685,7 @@ class FifoBuffer : public StreamInterface {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class LoggingAdapter : public StreamAdapterInterface {
- public:
-  LoggingAdapter(StreamInterface* stream, LoggingSeverity level,
-                 const std::string& label, bool hex_mode = false);
 
-  void set_label(const std::string& label);
-
-  virtual StreamResult Read(void* buffer, size_t buffer_len,
-                            size_t* read, int* error);
-  virtual StreamResult Write(const void* data, size_t data_len,
-                             size_t* written, int* error);
-  virtual void Close();
-
- protected:
-  virtual void OnEvent(StreamInterface* stream, int events, int err);
-
- private:
-  LoggingSeverity level_;
-  std::string label_;
-  bool hex_mode_;
-  LogMultilineState lms_;
-
-  DISALLOW_EVIL_CONSTRUCTORS(LoggingAdapter);
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // StringStream - Reads/Writes to an external std::string

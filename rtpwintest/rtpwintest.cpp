@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "rtpwintest.h"
-#include "
+#include "rtp_Test.h"
 #define MAX_LOADSTRING 100
 
 // 全局变量:
@@ -29,6 +29,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	MSG msg;
 	HACCEL hAccelTable;
 
+	kk_Rtp_RtcpImpl* impl = new  kk_Rtp_RtcpImpl();
+	impl->init(1,640,480);
 	// 初始化全局字符串
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_RTPWINTEST, szWindowClass, MAX_LOADSTRING);
