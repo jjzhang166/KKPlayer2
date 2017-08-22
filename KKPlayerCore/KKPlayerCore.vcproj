@@ -507,58 +507,6 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="live555"
-			>
-			<File
-				RelativePath=".\live555\DummySink.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\DummySink.h"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\live555.h"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\live555_rec_avbuf_que.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\live555_rec_avbuf_que.h"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\live555_rtsp_io.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\live555rtsp.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\live555rtsp.h"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\ourRTSPClient.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\ourRTSPClient.h"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\StreamClientState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\live555\StreamClientState.h"
-				>
-			</File>
-		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>

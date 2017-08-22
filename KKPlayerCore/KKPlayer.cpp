@@ -1950,7 +1950,6 @@ void KKPlayer::ReadAV()
 		 av_dict_set(&format_opts, "max_delay","50",0);
 		 av_dict_set(&format_opts, "analyzeduration","1000000",0);
 	}else if(!strncmp(pVideoInfo->filename, "live:",5)){
-		 av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
 		 av_dict_set(&format_opts, "fflags","nobuffer", 0);
 		 av_dict_set(&format_opts, "max_delay","50",0);
 		 av_dict_set(&format_opts, "analyzeduration","1000000",0);
