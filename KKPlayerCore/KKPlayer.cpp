@@ -1942,12 +1942,18 @@ void KKPlayer::ReadAV()
 	if(!strncmp(pVideoInfo->filename, "rtmp:",5)){
         //rtmp 不支持 timeout
 		av_dict_set(&format_opts, "rw_timeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
-		av_dict_set(&format_opts, "fflags", "-nobuffer ", 0);
+		av_dict_set(&format_opts, "fflags", "nobuffer ", 0);
+		av_dict_set(&format_opts, "analyzeduration","1000000",0);
 	}else if(!strncmp(pVideoInfo->filename, "rtsp:",5)){
-		av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
-       // av_dict_set(&format_opts, "stimeout", MaxTimeOutStr, AV_DICT_MATCH_CASE);
+		 av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
 		 av_dict_set(&format_opts, "fflags","nobuffer", 0);
-		  av_dict_set(&format_opts, "max_delay","500",0);
+		 av_dict_set(&format_opts, "max_delay","50",0);
+		 av_dict_set(&format_opts, "analyzeduration","1000000",0);
+	}else if(!strncmp(pVideoInfo->filename, "live:",5)){
+		 av_dict_set(&format_opts, "rtsp_transport", "tcp", AV_DICT_MATCH_CASE);
+		 av_dict_set(&format_opts, "fflags","nobuffer", 0);
+		 av_dict_set(&format_opts, "max_delay","50",0);
+		 av_dict_set(&format_opts, "analyzeduration","1000000",0);
 	}
 	///命令行选项
 	if(m_strcmd.length()>1)
@@ -2556,9 +2562,9 @@ void KKPlayer::AvflushRealTime(int Avtype)
 }
 
 /******设置实时流媒体最小延迟**********/
-int KKPlayer::SetMaxRealtimeDelay(int Delay)
+int KKPlayer::SetMaxRealtimeDelay(double Delay)
 {
-     if(pVideoInfo!=NULL&&Delay>=1)
+     if(pVideoInfo!=NULL&&Delay>=1.0)
 	 {
 		 pVideoInfo->nMaxRealtimeDelay=Delay;
 		 return 1;

@@ -89,7 +89,7 @@ class KKPlayer
 			void ForceFlushQue();
 		
 			/******设置实时流媒体最小延迟,最小值2，单位秒**********/
-			int SetMaxRealtimeDelay(int Delay);
+			int SetMaxRealtimeDelay(double Delay);
             
 			//显示视频追踪信息,返回1成功
 			int ShowTraceAV(bool Show);
