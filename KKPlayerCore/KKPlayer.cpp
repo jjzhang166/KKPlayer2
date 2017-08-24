@@ -163,7 +163,7 @@ KKPlayer::~KKPlayer(void)
 
 }
 void FreeKKIo(SKK_VideoState *kkAV);
-void WillCloseKKIo(SKK_VideoState *kkAV);
+void WillCloseKKIo(AVIOContext *io);
 void KKPlayer::CloseMedia()
 {
 	m_AVInfoLock.Lock();
@@ -192,7 +192,7 @@ void KKPlayer::CloseMedia()
 		m_AVInfoLock.Unlock();
 		if(pllx&&pVideoInfo->pFormatCtx!=NULL&&pVideoInfo->ioflags==AVFMT_FLAG_CUSTOM_IO)
 		{
-				WillCloseKKIo(pVideoInfo);
+			WillCloseKKIo(pVideoInfo->pFormatCtx->pb);
 				pllx=0;
 		}
 		Sleep(20);
@@ -221,7 +221,7 @@ void KKPlayer::CloseMedia()
    
 	if(pllx&&pVideoInfo->pFormatCtx!=NULL&&pVideoInfo->ioflags==AVFMT_FLAG_CUSTOM_IO)
 	{
-			WillCloseKKIo(pVideoInfo);
+		WillCloseKKIo(pVideoInfo->pFormatCtx->pb);
 			pllx=0;
 	}
 
@@ -484,19 +484,12 @@ bool KKPlayer::GetMediaInfo(MEDIA_INFO &info)
 											snprintf(info.AVRes,1024,"%dx%d",pVideoInfo->viddec_width,pVideoInfo->viddec_height);
 											char infostr[1024]="";
 											if(pVideoInfo->viddec.avctx!=NULL){
-												strcat(infostr,"视频流信息:");
-												strcat(infostr,"\n+视频编码:");
-												strcat(infostr, pVideoInfo->viddec.avctx->codec->name);
-												strcat(infostr, "\n+平均码率:");   
-												char abcd[1024]="";
+
+												memset(&info.videoinfo.codecname,0,32);
+												strcpy(info.videoinfo.codecname, pVideoInfo->viddec.avctx->codec->name);
+												info.videoinfo.bitrate= pVideoInfo->viddec.avctx->bit_rate;
+												info.videoinfo.framerate= pVideoInfo->viddec.avctx->framerate.num;
 												
-												snprintf(abcd,1024,"%dkbps",pVideoInfo->viddec.avctx->bit_rate/1000);
-												strcat(infostr, abcd);
-
-												strcat(infostr, "\n+视频帧率:");   
-												snprintf(abcd,1024,"%d",pVideoInfo->viddec.avctx->framerate);
-												strcat(infostr, abcd);
-
 												if(pVideoInfo->auddec.avctx==NULL)
 												{
 													info.serial=pVideoInfo->viddec.pkt_serial;
@@ -507,27 +500,18 @@ bool KKPlayer::GetMediaInfo(MEDIA_INFO &info)
 											{
                                                 info.serial1=pVideoInfo->audio_clock_serial;
 												info.serial=pVideoInfo->auddec.pkt_serial;
-												strcat(infostr,"\n\n音频流信息:");
-												strcat(infostr,"\n+音频编码:");
-												strcat(infostr, pVideoInfo->auddec.avctx->codec->name);
-												strcat(infostr, "\n+平均码率:");   
-												char abcd[1024]="";
-												snprintf(abcd,1024,"%dkbps",pVideoInfo->auddec.avctx->bit_rate/1000);
-												strcat(infostr, abcd);
+												strcpy(info.audioinfo.codecname,pVideoInfo->auddec.avctx->codec->name);
+												
+												info.audioinfo.bitrate= pVideoInfo->auddec.avctx->bit_rate;
+											
 
-												strcat(infostr, "\n+采样帧率:");   
-												snprintf(abcd,1024,"%d Hz",pVideoInfo->auddec.avctx->sample_rate);
-												strcat(infostr, abcd);
-
-												strcat(infostr, "\n+声 道 数:");   
-												snprintf(abcd,1024,"%d channels",pVideoInfo->auddec.avctx->channels);
-												strcat(infostr, abcd);
+												info.audioinfo.sample_rate=pVideoInfo->auddec.avctx->sample_rate;
+												info.audioinfo.channels=pVideoInfo->auddec.avctx->channels;
 											}
 											if(pVideoInfo->seek_req!=0||m_nSeekTime!=0)
 											{
 											    info.serial=-1;
 											}
-											strcpy(info.AVinfo,infostr);
 
 											
 							}
@@ -1928,8 +1912,9 @@ void KKPlayer::ReadAV()
 	   pVideoInfo->NeedWait=true;
 	}
 
+	AVIOContext *customio=0;
 	if(KKProtocolAnalyze(pVideoInfo->filename,*pVideoInfo->pKKPluginInfo)==1){	
-	    pFormatCtx->pb=CreateKKIo(pVideoInfo);
+	    customio=pFormatCtx->pb=CreateKKIo(pVideoInfo);
         pFormatCtx->flags = AVFMT_FLAG_CUSTOM_IO;
 		pVideoInfo->ioflags= AVFMT_FLAG_CUSTOM_IO;
     }
@@ -2009,6 +1994,13 @@ void KKPlayer::ReadAV()
 	 
     //文件打开失败
 	if(err<0){
+		
+		
+		if(customio!=0)
+		{
+				WillCloseKKIo(customio);
+		}
+	
 		av_dict_free(&format_opts);
 		if(pFormatCtx!=NULL)
 		   avformat_free_context(pFormatCtx);
@@ -2018,9 +2010,12 @@ void KKPlayer::ReadAV()
 		pVideoInfo->abort_request=1;
 		m_PlayerLock.Unlock();
 
+
+		
         if(m_pPlayUI!=NULL){
 			m_pPlayUI->OpenMediaStateNotify(urlx,KKOpenUrlOkFailure);
 		}
+
 		LOGE_KK("avformat_open_input <0 \n");
 		return;
 	}

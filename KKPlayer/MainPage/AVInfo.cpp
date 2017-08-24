@@ -22,11 +22,30 @@ namespace SOUI
 		//richedit
         SRichEdit* pSRichEdit= (SRichEdit*)this->FindChildByName("EditAVInfo");
 		
-		WCHAR abcd[1024]=L"";
-		CChineseCode::charTowchar(Info.AVinfo,abcd,1024);
+		char strtemp[1024]="";
+
+		if(strlen(Info.videoinfo.codecname)>1&&strlen(Info.audioinfo.codecname)>1)
+		{
+		    ::sprintf(strtemp,"视频流信息:\n+视频编码:%s\n+平均码率:%d\n+视频帧率:%d\n\n音频流信息:\n+音频编码:%s\n+平均码率:%d\n+采样帧率:%d Hz\n+声 道 数:%d",
+			Info.videoinfo.codecname,Info.videoinfo.bitrate,Info.videoinfo.framerate,
+            Info.audioinfo.codecname,Info.audioinfo.bitrate,Info.audioinfo.sample_rate, Info.audioinfo.channels
+			);
+		}else if(strlen(Info.videoinfo.codecname)>1)
+		{
+		   ::sprintf(strtemp,"视频流信息:\n+视频编码:%s\n+平均码率:%d\n+视频帧率:%d",
+			Info.videoinfo.codecname,Info.videoinfo.bitrate,Info.videoinfo.framerate
+			);
+		}else if(strlen(Info.audioinfo.codecname)>1){
+		   ::sprintf(strtemp,"音频流信息:\n+音频编码:%s\n+平均码率:%d\n+采样帧率:%d Hz\n+声 道 数:%d",
+            Info.audioinfo.codecname,Info.audioinfo.bitrate,Info.audioinfo.sample_rate, Info.audioinfo.channels
+			);
+		}
+		
+		wchar_t abcd[1024]=L"";
+		CChineseCode::charTowchar(strtemp,abcd,1024);
 		pSRichEdit->SetWindowText(abcd);
 
-
+      
 		CChineseCode::charTowchar(Info.AVRes,abcd,1024);
 		this->FindChildByName("TxtAvRes")->SetWindowText(abcd);
 

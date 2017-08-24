@@ -7,13 +7,24 @@ typedef struct AVCACHE_INFO
 	int AudioSize;
 	int MaxTime;
 }AVCACHE_INFO;
+typedef struct AVCODE_INFO
+{
+  ///解码器名称
+  char codecname[32];
+  //平均码率
+  int bitrate;
+  int framerate;
+  int sample_rate;
+  int channels;//声 道 数
+}AVCODE_INFO;
 //获取播放器信息
 typedef struct MEDIA_INFO 
 {
 	//分辨率
 	char              AVRes[1024];
 	//编码信息
-	char              AVinfo[1024];
+	AVCODE_INFO       videoinfo;
+	AVCODE_INFO       audioinfo;
 	const char*       AvFile;
 	int               FileSize;
 	int               CurTime;
