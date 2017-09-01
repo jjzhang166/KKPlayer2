@@ -178,9 +178,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 	case WM_CLOSE:{
+		if(pAv){
 		            pAv->CloseMedia();
 					
 		            delete pAv;
+					pAv=NULL;
+		}
 				 }
 	case  WM_CREATE:
 		{
@@ -191,7 +194,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			  // int kstyle=WS_CHILDWINDOW | WS_CLIPCHILDREN| WS_CLIPSIBLINGS|WS_VISIBLE;
 		   //   // HWND hw = pAv->CreateKKPlayer(hWnd,rt,kstyle, 1);
 			     pAv->CreateDuiRawKKPlayer(hWnd,30,RenderImgCall,0);
-			     int ii= pAv->OpenMedia("D:/testvideo/ff.mp4");
+				 int ii= pAv->OpenMedia("librtmp:rtmp://live.hkstv.hk.lxdns.com/live/hks");
 			  // ::ShowWindow(hw,SW_SHOW);
 		}
 		break;
