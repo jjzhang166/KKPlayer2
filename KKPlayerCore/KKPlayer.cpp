@@ -487,7 +487,8 @@ bool KKPlayer::GetMediaInfo(MEDIA_INFO &info)
 
 												memset(&info.videoinfo.codecname,0,32);
 												strcpy(info.videoinfo.codecname, pVideoInfo->viddec.avctx->codec->name);
-												info.videoinfo.bitrate= pVideoInfo->viddec.avctx->bit_rate;
+												info.videoinfo.bitrate= pVideoInfo->video_st->codecpar->bit_rate;
+												//info.videoinfo.bitrate= pVideoInfo->viddec.avctx->bit_rate;
 												info.videoinfo.framerate= pVideoInfo->viddec.avctx->framerate.num;
 												
 												if(pVideoInfo->auddec.avctx==NULL)
