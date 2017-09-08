@@ -1,3 +1,17 @@
 #tar -xjf all.tar.bz2
 xz -d file
 tar -xvf 你的文件.tar.xz 
+
+上传文件 rz
+chmod 777 
+ps -aux | grep turnserver
+
+
+# wget http://www.monkey.org/~provos/libevent-2.0.10-stable.tar.gz
+# tar zxvf libevent-1.2.tar.gz
+# cd libevent-1.2
+# ./configure –prefix=/usr
+# make
+# make install
+
+coturn配置http://blog.csdn.net/u012908515/article/details/54863661
